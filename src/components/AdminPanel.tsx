@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting, addPainting, updatePainting, fileToBase64 } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting, getImageUrl } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
@@ -109,15 +109,17 @@ export const AdminPanel = () => {
     setFormLoading(true);
 
     try {
-      let imageUrl = formData.imageUrl;
+      let imageUrl = '';
 
-      // Convert image to Base64 if a new one was selected
+      // Use file if selected, otherwise use URL
       if (formData.image) {
-        imageUrl = await fileToBase64(formData.image);
+        imageUrl = await getImageUrl(formData.image);
+      } else if (formData.imageUrl) {
+        imageUrl = formData.imageUrl;
       }
 
       if (!imageUrl) {
-        alert('Please select an image');
+        alert('Please select an image or provide an image URL');
         return;
       }
 
@@ -415,7 +417,16 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">Image</label>
+                <label className="block text-sm font-light mb-2">Image URL or File</label>
+                <input
+                  type="text"
+                  placeholder="Paste image URL or select file below"
+                  value={formData.imageUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black mb-2"
+                />
                 <input
                   type="file"
                   accept="image/*"
@@ -428,7 +439,7 @@ export const AdminPanel = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Select a JPG, PNG, or GIF image file to upload. Max 5MB.
+                  Paste an image URL above or select a file to upload (JPG, PNG, GIF). File upload takes priority.
                 </p>
               </div>
 

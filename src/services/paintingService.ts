@@ -16,14 +16,20 @@ import { Painting, PaintingFormData } from '../types/painting';
 
 const PAINTINGS_COLLECTION = 'paintings';
 
-// Convert image file to Base64 string
-export const fileToBase64 = async (file: File): Promise<string> => {
+// Convert file to image URL (accepts both File objects and URL strings)
+export const getImageUrl = async (imageInput: File | string): Promise<string> => {
+  // If it's already a URL string, return it as-is
+  if (typeof imageInput === 'string') {
+    return imageInput;
+  }
+
+  // If it's a File, convert to data URL
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(imageInput);
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = (error) => {
-      console.error('Error converting file to Base64:', error);
+      console.error('Error reading file:', error);
       reject(error);
     };
   });
