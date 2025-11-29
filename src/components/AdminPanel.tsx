@@ -4,7 +4,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
-import { uploadImageToGithub, validateGithubCredentials } from '../services/githubUploadService';
+import { uploadImageToGithub } from '../services/githubUploadService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
 import { About } from '../types/about';
@@ -51,12 +51,13 @@ export const AdminPanel = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [showGithubModal, setShowGithubModal] = useState(false);
-  const [githubToken, setGithubToken] = useState('');
-  const [githubOwner, setGithubOwner] = useState('');
-  const [githubRepo, setGithubRepo] = useState('');
-  const [isValidatingGithub, setIsValidatingGithub] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load GitHub credentials from environment variables
+  const githubToken = process.env.REACT_APP_GITHUB_TOKEN || '';
+  const githubOwner = process.env.REACT_APP_GITHUB_OWNER || '';
+  const githubRepo = process.env.REACT_APP_GITHUB_REPO || '';
+  const hasGithubConfig = githubToken && githubOwner && githubRepo;
   const [formData, setFormData] = useState<FormData>({
     titleEn: '',
     titleHe: '',
@@ -344,34 +345,12 @@ export const AdminPanel = () => {
     }
   };
 
-  const handleValidateGithub = async () => {
-    if (!githubToken || !githubOwner || !githubRepo) {
-      alert('Please fill in all GitHub credentials');
-      return;
-    }
-
-    setIsValidatingGithub(true);
-    try {
-      const result = await validateGithubCredentials(githubToken, githubOwner, githubRepo);
-      if (result.valid) {
-        alert('GitHub credentials validated successfully!');
-      } else {
-        alert(`Validation failed: ${result.error}`);
-      }
-    } catch (error) {
-      console.error('Error validating GitHub credentials:', error);
-      alert('Error validating credentials');
-    } finally {
-      setIsValidatingGithub(false);
-    }
-  };
-
   const handleFileUploadToGithub = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!githubToken || !githubOwner || !githubRepo) {
-      alert('Please configure GitHub credentials first');
+    if (!hasGithubConfig) {
+      alert('GitHub credentials not configured in environment variables');
       fileInputRef.current?.click(); // Reset file input
       return;
     }
@@ -380,8 +359,8 @@ export const AdminPanel = () => {
     try {
       const result = await uploadImageToGithub(file, githubToken, githubOwner, githubRepo);
 
-      if (result.success && result.url) {
-        setFormData({ ...formData, imageUrl: result.path || result.url });
+      if (result.success && result.path) {
+        setFormData({ ...formData, imageUrl: result.path });
         alert('Image uploaded to GitHub successfully!');
       } else {
         alert(`Upload failed: ${result.error}`);
@@ -872,53 +851,39 @@ export const AdminPanel = () => {
               <div>
                 <label className="block text-sm font-light mb-2">{t('admin.formLabels.imageUrl')}</label>
                 <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder={t('admin.formLabels.pasteUrl')}
-                    value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imageUrl: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                  <p className="text-xs text-gray-500">
-                    {t('admin.formLabels.helpText')}
-                  </p>
-
-                  {/* GitHub Upload Section */}
-                  <div className="pt-2 border-t border-gray-200">
-                    <button
-                      type="button"
-                      onClick={() => setShowGithubModal(true)}
-                      className="text-xs text-blue-600 hover:text-blue-800 font-light mb-2 block"
-                    >
-                      Setup GitHub Upload
-                    </button>
-                    <div className="flex gap-2">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUploadToGithub}
-                        className="hidden"
-                      />
+                  <div className="flex gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUploadToGithub}
+                      className="hidden"
+                    />
+                    <input
+                      type="text"
+                      placeholder={t('admin.formLabels.pasteUrl')}
+                      value={formData.imageUrl}
+                      onChange={(e) =>
+                        setFormData({ ...formData, imageUrl: e.target.value })
+                      }
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                    {hasGithubConfig && (
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={!githubToken || !githubOwner || !githubRepo || formLoading}
-                        className="text-xs px-3 py-1 border border-blue-300 text-blue-600 rounded hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        disabled={formLoading}
+                        className="px-3 py-2 border border-blue-300 text-blue-600 rounded hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap font-light text-sm"
                       >
-                        📤 Upload to GitHub
+                        📤 Upload
                       </motion.button>
-                    </div>
-                    {githubOwner && githubRepo && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        Repo: {githubOwner}/{githubRepo}
-                      </p>
                     )}
                   </div>
+                  <p className="text-xs text-gray-500">
+                    {t('admin.formLabels.helpText')}
+                  </p>
                 </div>
               </div>
 
@@ -1027,97 +992,6 @@ export const AdminPanel = () => {
         </motion.div>
       )}
 
-      {/* GitHub Upload Modal */}
-      {showGithubModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowGithubModal(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg p-8 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-2xl font-light mb-6">GitHub Upload Setup</h2>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleValidateGithub();
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-light mb-2">GitHub Token</label>
-                <input
-                  type="password"
-                  placeholder="ghp_xxxxxxxxxxxx"
-                  value={githubToken}
-                  onChange={(e) => setGithubToken(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  <a
-                    href="https://github.com/settings/tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Create a GitHub token
-                  </a>
-                  {' '}with repo access
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-light mb-2">GitHub Username</label>
-                <input
-                  type="text"
-                  placeholder="erank"
-                  value={githubOwner}
-                  onChange={(e) => setGithubOwner(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-light mb-2">Repository Name</label>
-                <input
-                  type="text"
-                  placeholder="painter-portfolio-website"
-                  value={githubRepo}
-                  onChange={(e) => setGithubRepo(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="submit"
-                  disabled={isValidatingGithub}
-                  className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
-                >
-                  {isValidatingGithub ? 'Validating...' : 'Validate & Save'}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={() => setShowGithubModal(false)}
-                  className="flex-1 border border-gray-300 py-2 rounded-lg font-light hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </motion.button>
-              </div>
-            </form>
-          </motion.div>
-        </motion.div>
-      )}
     </motion.div>
   );
 };
