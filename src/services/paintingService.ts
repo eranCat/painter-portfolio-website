@@ -64,22 +64,47 @@ export const addPainting = async (paintingData: PaintingFormData, imageUrl: stri
 // Get all paintings
 export const getPaintings = async (): Promise<Painting[]> => {
   try {
-    const q = query(
-      collection(db, PAINTINGS_COLLECTION),
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    const paintings: Painting[] = [];
+    // First try to query with orderBy
+    try {
+      const q = query(
+        collection(db, PAINTINGS_COLLECTION),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const paintings: Painting[] = [];
 
-    querySnapshot.forEach((doc) => {
-      paintings.push({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      } as Painting);
-    });
+      querySnapshot.forEach((doc) => {
+        paintings.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+        } as Painting);
+      });
 
-    return paintings;
+      console.log('Fetched paintings:', paintings);
+      return paintings;
+    } catch (orderByError: any) {
+      // If orderBy fails (e.g., no index), fall back to unordered query
+      if (orderByError?.code === 'failed-precondition') {
+        console.warn('OrderBy index not available, fetching without order:', orderByError);
+        const querySnapshot = await getDocs(collection(db, PAINTINGS_COLLECTION));
+        const paintings: Painting[] = [];
+
+        querySnapshot.forEach((doc) => {
+          paintings.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate() || new Date(),
+          } as Painting);
+        });
+
+        // Sort client-side if we couldn't do it server-side
+        paintings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        console.log('Fetched paintings (client-sorted):', paintings);
+        return paintings;
+      }
+      throw orderByError;
+    }
   } catch (error) {
     console.error('Error fetching paintings:', error);
     return [];
@@ -89,23 +114,49 @@ export const getPaintings = async (): Promise<Painting[]> => {
 // Get featured paintings
 export const getFeaturedPaintings = async (): Promise<Painting[]> => {
   try {
-    const q = query(
-      collection(db, PAINTINGS_COLLECTION),
-      where('featured', '==', true),
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    const paintings: Painting[] = [];
+    try {
+      const q = query(
+        collection(db, PAINTINGS_COLLECTION),
+        where('featured', '==', true),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const paintings: Painting[] = [];
 
-    querySnapshot.forEach((doc) => {
-      paintings.push({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      } as Painting);
-    });
+      querySnapshot.forEach((doc) => {
+        paintings.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+        } as Painting);
+      });
 
-    return paintings;
+      return paintings;
+    } catch (orderByError: any) {
+      // If orderBy fails, fall back to unordered query
+      if (orderByError?.code === 'failed-precondition') {
+        console.warn('OrderBy index not available, fetching without order:', orderByError);
+        const q = query(
+          collection(db, PAINTINGS_COLLECTION),
+          where('featured', '==', true)
+        );
+        const querySnapshot = await getDocs(q);
+        const paintings: Painting[] = [];
+
+        querySnapshot.forEach((doc) => {
+          paintings.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate() || new Date(),
+          } as Painting);
+        });
+
+        // Sort client-side
+        paintings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return paintings;
+      }
+      throw orderByError;
+    }
   } catch (error) {
     console.error('Error fetching featured paintings:', error);
     return [];

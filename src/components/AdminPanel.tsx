@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
+import { getAbout, updateAbout } from '../services/aboutService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
+import { About } from '../types/about';
 
 interface FormData {
   titleEn: string;
@@ -21,11 +23,29 @@ interface FormData {
   dimensionUnit: string;
 }
 
+interface AboutFormData {
+  descriptionEn: string;
+  descriptionHe: string;
+  contemporaryTitleEn: string;
+  contemporaryTitleHe: string;
+  contemporaryDescEn: string;
+  contemporaryDescHe: string;
+  authenticTitleEn: string;
+  authenticTitleHe: string;
+  authenticDescEn: string;
+  authenticDescHe: string;
+  accessibleTitleEn: string;
+  accessibleTitleHe: string;
+  accessibleDescEn: string;
+  accessibleDescHe: string;
+}
+
 export const AdminPanel = () => {
   const { t } = useLanguage();
-  const [tab, setTab] = useState<'paintings' | 'contacts'>('paintings');
+  const [tab, setTab] = useState<'paintings' | 'contacts' | 'about'>('paintings');
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [about, setAbout] = useState<About | null>(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,6 +64,22 @@ export const AdminPanel = () => {
     dimensionHeight: '',
     dimensionUnit: 'cm',
   });
+  const [aboutFormData, setAboutFormData] = useState<AboutFormData>({
+    descriptionEn: '',
+    descriptionHe: '',
+    contemporaryTitleEn: '',
+    contemporaryTitleHe: '',
+    contemporaryDescEn: '',
+    contemporaryDescHe: '',
+    authenticTitleEn: '',
+    authenticTitleHe: '',
+    authenticDescEn: '',
+    authenticDescHe: '',
+    accessibleTitleEn: '',
+    accessibleTitleHe: '',
+    accessibleDescEn: '',
+    accessibleDescHe: '',
+  });
 
   useEffect(() => {
     loadData();
@@ -52,12 +88,46 @@ export const AdminPanel = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [paintingsData, contactsData] = await Promise.all([
-        getPaintings(),
-        getContacts(),
+      const paintingsPromise = getPaintings().catch((error) => {
+        console.error('Error loading paintings:', error);
+        return [];
+      });
+      const contactsPromise = getContacts().catch((error) => {
+        console.error('Error loading contacts:', error);
+        return [];
+      });
+      const aboutPromise = getAbout().catch((error) => {
+        console.error('Error loading about:', error);
+        return null;
+      });
+
+      const [paintingsData, contactsData, aboutData] = await Promise.all([
+        paintingsPromise,
+        contactsPromise,
+        aboutPromise,
       ]);
-      setPaintings(paintingsData);
-      setContacts(contactsData);
+
+      setPaintings(paintingsData || []);
+      setContacts(contactsData || []);
+      if (aboutData) {
+        setAbout(aboutData);
+        setAboutFormData({
+          descriptionEn: aboutData.description.en,
+          descriptionHe: aboutData.description.he,
+          contemporaryTitleEn: aboutData.features.contemporary.title.en,
+          contemporaryTitleHe: aboutData.features.contemporary.title.he,
+          contemporaryDescEn: aboutData.features.contemporary.description.en,
+          contemporaryDescHe: aboutData.features.contemporary.description.he,
+          authenticTitleEn: aboutData.features.authentic.title.en,
+          authenticTitleHe: aboutData.features.authentic.title.he,
+          authenticDescEn: aboutData.features.authentic.description.en,
+          authenticDescHe: aboutData.features.authentic.description.he,
+          accessibleTitleEn: aboutData.features.accessible.title.en,
+          accessibleTitleHe: aboutData.features.accessible.title.he,
+          accessibleDescEn: aboutData.features.accessible.description.en,
+          accessibleDescHe: aboutData.features.accessible.description.he,
+        });
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -214,6 +284,59 @@ export const AdminPanel = () => {
     }
   };
 
+  const handleSubmitAboutForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      await updateAbout({
+        description: {
+          en: aboutFormData.descriptionEn,
+          he: aboutFormData.descriptionHe,
+        },
+        features: {
+          contemporary: {
+            title: {
+              en: aboutFormData.contemporaryTitleEn,
+              he: aboutFormData.contemporaryTitleHe,
+            },
+            description: {
+              en: aboutFormData.contemporaryDescEn,
+              he: aboutFormData.contemporaryDescHe,
+            },
+          },
+          authentic: {
+            title: {
+              en: aboutFormData.authenticTitleEn,
+              he: aboutFormData.authenticTitleHe,
+            },
+            description: {
+              en: aboutFormData.authenticDescEn,
+              he: aboutFormData.authenticDescHe,
+            },
+          },
+          accessible: {
+            title: {
+              en: aboutFormData.accessibleTitleEn,
+              he: aboutFormData.accessibleTitleHe,
+            },
+            description: {
+              en: aboutFormData.accessibleDescEn,
+              he: aboutFormData.accessibleDescHe,
+            },
+          },
+        },
+      });
+      await loadData();
+      alert('About section updated successfully!');
+    } catch (error) {
+      console.error('Error saving about:', error);
+      alert('Error saving about. Please try again.');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -241,6 +364,16 @@ export const AdminPanel = () => {
           }`}
         >
           {t('admin.contacts')}
+        </button>
+        <button
+          onClick={() => setTab('about')}
+          className={`pb-3 px-4 font-light tracking-wide transition-colors ${
+            tab === 'about'
+              ? 'border-b-2 border-black text-black'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          {t('nav.about')}
         </button>
       </div>
 
@@ -271,6 +404,7 @@ export const AdminPanel = () => {
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
+                    <th className="px-4 py-3 font-light">Image</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.title')}</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.year')}</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.actions')}</th>
@@ -282,6 +416,16 @@ export const AdminPanel = () => {
                       key={painting.id}
                       className="border-b border-gray-200 hover:bg-gray-50"
                     >
+                      <td className="px-4 py-3">
+                        <img
+                          src={painting.imageUrl}
+                          alt={painting.title.en}
+                          className="h-12 w-12 object-cover rounded"
+                          onError={(e) => {
+                            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48"%3E%3Crect fill="%23f0f0f0" width="48" height="48"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
+                          }}
+                        />
+                      </td>
                       <td className="px-4 py-3">{painting.title.en}</td>
                       <td className="px-4 py-3">{painting.year}</td>
                       <td className="px-4 py-3 space-x-2">
@@ -376,6 +520,216 @@ export const AdminPanel = () => {
                 </tbody>
               </table>
             </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* About Tab */}
+      {tab === 'about' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="space-y-6"
+        >
+          <h3 className="text-lg font-light mb-4">{t('nav.about')} Content</h3>
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
+          ) : (
+            <form onSubmit={handleSubmitAboutForm} className="space-y-6">
+              {/* Main Description */}
+              <div>
+                <h4 className="text-md font-light mb-3 border-b pb-2">Main Description</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-light mb-2">English</label>
+                    <textarea
+                      value={aboutFormData.descriptionEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, descriptionEn: e.target.value })
+                      }
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Hebrew</label>
+                    <textarea
+                      value={aboutFormData.descriptionHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, descriptionHe: e.target.value })
+                      }
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contemporary Feature */}
+              <div>
+                <h4 className="text-md font-light mb-3 border-b pb-2">Contemporary Feature</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (EN)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.contemporaryTitleEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, contemporaryTitleEn: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (HE)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.contemporaryTitleHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, contemporaryTitleHe: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (EN)</label>
+                    <textarea
+                      value={aboutFormData.contemporaryDescEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, contemporaryDescEn: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (HE)</label>
+                    <textarea
+                      value={aboutFormData.contemporaryDescHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, contemporaryDescHe: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Authentic Feature */}
+              <div>
+                <h4 className="text-md font-light mb-3 border-b pb-2">Authentic Feature</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (EN)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.authenticTitleEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, authenticTitleEn: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (HE)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.authenticTitleHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, authenticTitleHe: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (EN)</label>
+                    <textarea
+                      value={aboutFormData.authenticDescEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, authenticDescEn: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (HE)</label>
+                    <textarea
+                      value={aboutFormData.authenticDescHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, authenticDescHe: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Accessible Feature */}
+              <div>
+                <h4 className="text-md font-light mb-3 border-b pb-2">Accessible Feature</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (EN)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.accessibleTitleEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, accessibleTitleEn: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Title (HE)</label>
+                    <input
+                      type="text"
+                      value={aboutFormData.accessibleTitleHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, accessibleTitleHe: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (EN)</label>
+                    <textarea
+                      value={aboutFormData.accessibleDescEn}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, accessibleDescEn: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-light mb-2">Description (HE)</label>
+                    <textarea
+                      value={aboutFormData.accessibleDescHe}
+                      onChange={(e) =>
+                        setAboutFormData({ ...aboutFormData, accessibleDescHe: e.target.value })
+                      }
+                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={formLoading}
+                  className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                >
+                  {formLoading ? t('admin.buttons.saving') : 'Save About Section'}
+                </motion.button>
+              </div>
+            </form>
           )}
         </motion.div>
       )}
