@@ -97,6 +97,10 @@
       "width": "Width",
       "height": "Height",
       "unit": "Unit"
-    }
+    },
+    "confirmDelete": "Are you sure you want to delete this?",
+    "deleteSuccess": "Deleted successfully!",
+    "deleteError": "Error deleting item. Please try again.",
+    "provideImageUrl": "Please provide an image URL"
   }
 }

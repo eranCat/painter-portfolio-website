@@ -51,27 +51,27 @@ export const AdminPanel = () => {
   };
 
   const handleDeletePainting = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this painting?')) {
+    if (window.confirm(t('admin.confirmDelete'))) {
       try {
         await deletePainting(id);
         setPaintings(paintings.filter((p) => p.id !== id));
-        alert('Painting deleted successfully!');
+        alert(t('admin.deleteSuccess'));
       } catch (error) {
         console.error('Error deleting painting:', error);
-        alert('Error deleting painting. Please try again.');
+        alert(t('admin.deleteError'));
       }
     }
   };
 
   const handleDeleteContact = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this contact?')) {
+    if (window.confirm(t('admin.confirmDelete'))) {
       try {
         await deleteContact(id);
         setContacts(contacts.filter((c) => c.id !== id));
-        alert('Contact deleted successfully!');
+        alert(t('admin.deleteSuccess'));
       } catch (error) {
         console.error('Error deleting contact:', error);
-        alert('Error deleting contact. Please try again.');
+        alert(t('admin.deleteError'));
       }
     }
   };
@@ -138,7 +138,7 @@ export const AdminPanel = () => {
       const imageUrl = formData.imageUrl;
 
       if (!imageUrl) {
-        alert('Please provide an image URL');
+        alert(t('admin.provideImageUrl'));
         return;
       }
 
@@ -246,19 +246,19 @@ export const AdminPanel = () => {
           </motion.button>
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
           ) : paintings.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No paintings yet. Create your first one!
+              {t('admin.noPaintingsYet')}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 font-light">Title</th>
-                    <th className="px-4 py-3 font-light">Year</th>
-                    <th className="px-4 py-3 font-light">Actions</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.title')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.year')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -304,11 +304,11 @@ export const AdminPanel = () => {
           className="space-y-4"
         >
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
           ) : contacts.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 font-light">
-                No contact messages yet. When visitors contact you, they'll appear here!
+                {t('admin.noContactsYet')}
               </p>
             </div>
           ) : (
@@ -316,11 +316,11 @@ export const AdminPanel = () => {
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 font-light">Name</th>
-                    <th className="px-4 py-3 font-light">Email</th>
-                    <th className="px-4 py-3 font-light">Message</th>
-                    <th className="px-4 py-3 font-light">Date</th>
-                    <th className="px-4 py-3 font-light">Actions</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.name')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.email')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.message')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.date')}</th>
+                    <th className="px-4 py-3 font-light">{t('admin.tableHeaders.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -345,7 +345,7 @@ export const AdminPanel = () => {
                           href={`mailto:${contact.email}`}
                           className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 inline-block"
                         >
-                          Reply
+                          {t('admin.buttons.reply')}
                         </motion.a>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -353,7 +353,7 @@ export const AdminPanel = () => {
                           onClick={() => handleDeleteContact(contact.id)}
                           className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
                         >
-                          Delete
+                          {t('admin.buttons.delete')}
                         </motion.button>
                       </td>
                     </motion.tr>
@@ -380,13 +380,13 @@ export const AdminPanel = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-light mb-6">
-              {editingId ? 'Edit Painting' : 'Add New Painting'}
+              {editingId ? t('admin.buttons.update') : t('admin.addPainting')}
             </h2>
 
             <form onSubmit={handleSubmitForm} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-light mb-2">Title (English)</label>
+                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.titleEn')}</label>
                   <input
                     type="text"
                     value={formData.titleEn}
@@ -398,7 +398,7 @@ export const AdminPanel = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-light mb-2">Title (Hebrew)</label>
+                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.titleHe')}</label>
                   <input
                     type="text"
                     value={formData.titleHe}
@@ -413,7 +413,7 @@ export const AdminPanel = () => {
 
               <div>
                 <label className="block text-sm font-light mb-2">
-                  Description (English)
+                  {t('admin.formLabels.descriptionEn')}
                 </label>
                 <textarea
                   value={formData.descriptionEn}
@@ -427,7 +427,7 @@ export const AdminPanel = () => {
 
               <div>
                 <label className="block text-sm font-light mb-2">
-                  Description (Hebrew)
+                  {t('admin.formLabels.descriptionHe')}
                 </label>
                 <textarea
                   value={formData.descriptionHe}
@@ -440,10 +440,10 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">Image URL</label>
+                <label className="block text-sm font-light mb-2">{t('admin.formLabels.imageUrl')}</label>
                 <input
                   type="text"
-                  placeholder="Paste image URL here"
+                  placeholder={t('admin.formLabels.pasteUrl')}
                   value={formData.imageUrl}
                   onChange={(e) =>
                     setFormData({ ...formData, imageUrl: e.target.value })
@@ -451,13 +451,13 @@ export const AdminPanel = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Paste a direct image URL (e.g., https://example.com/image.jpg)
+                  {t('admin.formLabels.helpText')}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-light mb-2">Category</label>
+                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.category')}</label>
                   <select
                     value={formData.category}
                     onChange={(e) =>
@@ -465,14 +465,14 @@ export const AdminPanel = () => {
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   >
-                    <option value="abstract">Abstract</option>
-                    <option value="portrait">Portrait</option>
-                    <option value="landscape">Landscape</option>
-                    <option value="still-life">Still Life</option>
+                    <option value="abstract">{t('admin.formLabels.categories.abstract')}</option>
+                    <option value="portrait">{t('admin.formLabels.categories.portrait')}</option>
+                    <option value="landscape">{t('admin.formLabels.categories.landscape')}</option>
+                    <option value="still-life">{t('admin.formLabels.categories.stillLife')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-light mb-2">Year</label>
+                  <label className="block text-sm font-light mb-2">{t('admin.tableHeaders.year')}</label>
                   <input
                     type="number"
                     value={formData.year}
@@ -485,10 +485,10 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">Dimensions</label>
+                <label className="block text-sm font-light mb-2">{t('admin.formLabels.dimensions')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">Width</label>
+                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.width')}</label>
                     <input
                       type="number"
                       step="0.1"
@@ -501,7 +501,7 @@ export const AdminPanel = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">Height</label>
+                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.height')}</label>
                     <input
                       type="number"
                       step="0.1"
@@ -514,7 +514,7 @@ export const AdminPanel = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">Unit</label>
+                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.unit')}</label>
                     <select
                       value={formData.dimensionUnit || 'cm'}
                       onChange={(e) =>
@@ -543,7 +543,7 @@ export const AdminPanel = () => {
                   disabled={formLoading}
                   className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
                 >
-                  {formLoading ? 'Saving...' : editingId ? 'Update Painting' : 'Add Painting'}
+                  {formLoading ? t('admin.buttons.saving') : editingId ? t('admin.buttons.update') : t('admin.buttons.add')}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -552,7 +552,7 @@ export const AdminPanel = () => {
                   onClick={() => setShowForm(false)}
                   className="flex-1 border border-gray-300 py-2 rounded-lg font-light hover:bg-gray-50 transition-colors"
                 >
-                  Cancel
+                  {t('admin.buttons.cancel')}
                 </motion.button>
               </div>
             </form>

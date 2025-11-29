@@ -97,6 +97,10 @@
       "width": "רוחב",
       "height": "גובה",
       "unit": "יחידה"
-    }
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק זאת?",
+    "deleteSuccess": "נמחק בהצלחה!",
+    "deleteError": "שגיאה במחיקת הפריט. נא לנסות שוב.",
+    "provideImageUrl": "אנא ספק כתובת URL של תמונה"
   }
 }
