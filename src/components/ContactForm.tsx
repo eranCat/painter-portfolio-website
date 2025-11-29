@@ -33,6 +33,12 @@ export const ContactForm = () => {
       // Save to Firebase
       await addContact(formData);
 
+      // Send WhatsApp message automatically
+      const artistPhone = '+9720526948351';
+      const whatsappMessage = `${t('contact.name')}: ${formData.name}\n${t('contact.email')}: ${formData.email}\n${t('contact.phone')}: ${formData.phone}\n\n${t('contact.message')}:\n${formData.message}`;
+      const whatsappUrl = `https://wa.me/${artistPhone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
+      window.open(whatsappUrl, '_blank');
+
       // Show success message
       setSubmitted(true);
       setFormData({ name: '', email: '', phone: '', message: '' });
@@ -129,17 +135,6 @@ export const ContactForm = () => {
       >
         {t('contact.send')}
       </motion.button>
-
-      <motion.a
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        href="https://wa.me/?text=Hello"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-full bg-green-500 text-white py-3 rounded-lg font-light tracking-wider hover:bg-green-600 transition-colors text-center"
-      >
-        💬 {t('contact.whatsapp')}
-      </motion.a>
     </motion.form>
   );
 };
