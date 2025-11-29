@@ -24,7 +24,7 @@ export const ThemeSelector = () => {
             className="w-6 h-6"
             viewBox="0 0 24 24"
             fill="currentColor"
-            style={{ color: '#2a2a2a' }}
+            style={{ color: '#ffffff' }}
           >
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
