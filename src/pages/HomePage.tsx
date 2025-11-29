@@ -1,4 +1,4 @@
-import { Gallery3D } from '../components/Gallery3D';
+import { PaintingCarousel } from '../components/PaintingCarousel';
 import { ContactForm } from '../components/ContactForm';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../hooks/useLanguage';
@@ -125,8 +125,8 @@ export const HomePage = () => {
         </div>
       </section>
 
-      <section id="gallery" className="py-0 bg-white">
-        <Gallery3D />
+      <section id="gallery" className="bg-white">
+        <PaintingCarousel />
       </section>
 
       <section id="contact" className="py-20 bg-white">

@@ -44,7 +44,21 @@
   "gallery": {
     "loading": "טוען גלריה...",
     "noUploads": "עדיין לא הועלו עבודות",
-    "close": "סגור"
+    "close": "סגור",
+    "noPaintings": "אין ציורים להצגה",
+    "imageLoading": "טוען תמונה..."
+  },
+  "carousel": {
+    "previous": "ציור קודם",
+    "next": "ציור הבא",
+    "goToSlide": "עבור לשקופית"
+  },
+  "painting": {
+    "category": "קטגוריה",
+    "dimensions": "מימדים"
+  },
+  "common": {
+    "loading": "טוען..."
   },
   "admin": {
     "title": "לוח בקרה",

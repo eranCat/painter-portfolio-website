@@ -44,7 +44,21 @@
   "gallery": {
     "loading": "Loading gallery...",
     "noUploads": "No uploads yet",
-    "close": "Close"
+    "close": "Close",
+    "noPaintings": "No paintings to display",
+    "imageLoading": "Loading image..."
+  },
+  "carousel": {
+    "previous": "Previous painting",
+    "next": "Next painting",
+    "goToSlide": "Go to slide"
+  },
+  "painting": {
+    "category": "Category",
+    "dimensions": "Dimensions"
+  },
+  "common": {
+    "loading": "Loading..."
   },
   "admin": {
     "title": "Admin Dashboard",
