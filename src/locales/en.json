@@ -102,6 +102,10 @@
       "imageUrl": "Image URL",
       "pasteUrl": "Paste image URL here",
       "helpText": "Paste a direct image URL (e.g., https://example.com/image.jpg)",
+      "uploadImage": "Upload Image",
+      "selectImage": "Select Image File",
+      "imageSelected": "Image selected",
+      "uploading": "Uploading...",
       "category": "Category",
       "categories": {
         "abstract": "Abstract",

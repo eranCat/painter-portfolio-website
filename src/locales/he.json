@@ -102,6 +102,10 @@
       "imageUrl": "כתובת URL של התמונה",
       "pasteUrl": "הדבק כתובת URL של תמונה",
       "helpText": "הדבק כתובת URL ישירה של תמונה (לדוגמה, https://example.com/image.jpg)",
+      "uploadImage": "העלה תמונה",
+      "selectImage": "בחר קובץ תמונה",
+      "imageSelected": "התמונה נבחרה",
+      "uploading": "בהעלאה...",
       "category": "קטגוריה",
       "categories": {
         "abstract": "אבסטרקטי",

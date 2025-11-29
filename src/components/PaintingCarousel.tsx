@@ -27,46 +27,59 @@ export const PaintingCarousel = () => {
     loadPaintings();
   }, []);
 
-  // Load image with canvas-based approach for CORS compliance
+  // Load image with fallback for CORS-restricted images
   useEffect(() => {
     if (paintings.length === 0) return;
 
     const currentPainting = paintings[currentIndex];
+    setImageUrl(''); // Reset before loading new image
+
+    // Try canvas-based approach first (works with CORS-enabled images)
     const img = new Image();
     img.crossOrigin = 'anonymous';
 
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 1024;
-      const ctx = canvas.getContext('2d');
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
 
-      if (ctx) {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, 1024, 1024);
+        if (ctx) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, 1024, 1024);
 
-        const imgAspect = img.width / img.height;
-        let drawWidth = 1024,
-          drawHeight = 1024,
-          offsetX = 0,
-          offsetY = 0;
+          const imgAspect = img.width / img.height;
+          let drawWidth = 1024,
+            drawHeight = 1024,
+            offsetX = 0,
+            offsetY = 0;
 
-        if (imgAspect > 1) {
-          drawHeight = 1024 / imgAspect;
-          offsetY = (1024 - drawHeight) / 2;
-        } else {
-          drawWidth = 1024 * imgAspect;
-          offsetX = (1024 - drawWidth) / 2;
+          if (imgAspect > 1) {
+            drawHeight = 1024 / imgAspect;
+            offsetY = (1024 - drawHeight) / 2;
+          } else {
+            drawWidth = 1024 * imgAspect;
+            offsetX = (1024 - drawWidth) / 2;
+          }
+
+          ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+          setImageUrl(canvas.toDataURL());
         }
-
-        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-        setImageUrl(canvas.toDataURL());
+      } catch (error) {
+        console.warn('Canvas approach failed, using direct image URL:', error);
+        // Fallback: use image directly (may show CORS warning but will still display)
+        setImageUrl(currentPainting.imageUrl);
       }
     };
 
     img.onerror = () => {
-      console.error('Failed to load image:', currentPainting.imageUrl);
-      setImageUrl('');
+      console.warn(
+        'Canvas load failed for image, attempting direct load:',
+        currentPainting.imageUrl
+      );
+      // Fallback to direct image URL even if CORS fails
+      setImageUrl(currentPainting.imageUrl);
     };
 
     img.src = currentPainting.imageUrl;

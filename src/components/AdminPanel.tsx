@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting, uploadPaintingImage } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
 import { Painting } from '../types/painting';
@@ -50,6 +50,8 @@ export const AdminPanel = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<FormData>({
     titleEn: '',
     titleHe: '',
@@ -213,6 +215,27 @@ export const AdminPanel = () => {
       dimensionUnit,
     });
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageUploading(true);
+    try {
+      const uploadedUrl = await uploadPaintingImage(file);
+      setFormData({ ...formData, imageUrl: uploadedUrl, image: file });
+      alert(t('admin.deleteSuccess')); // Reusing success message for image upload
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. Please try again.');
+    } finally {
+      setImageUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleSubmitForm = async (e: React.FormEvent) => {
@@ -808,20 +831,50 @@ export const AdminPanel = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-light mb-2">{t('admin.formLabels.imageUrl')}</label>
-                <input
-                  type="text"
-                  placeholder={t('admin.formLabels.pasteUrl')}
-                  value={formData.imageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, imageUrl: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  {t('admin.formLabels.helpText')}
-                </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.uploadImage')}</label>
+                  <div className="flex gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={imageUploading}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    />
+                    {imageUploading && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                        {t('admin.formLabels.uploading')}
+                      </div>
+                    )}
+                  </div>
+                  {formData.imageUrl && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      {t('admin.formLabels.imageSelected')}
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-gray-200 pt-3">
+                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.imageUrl')}</label>
+                  <input
+                    type="text"
+                    placeholder={t('admin.formLabels.pasteUrl')}
+                    value={formData.imageUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imageUrl: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    {t('admin.formLabels.helpText')}
+                  </p>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
