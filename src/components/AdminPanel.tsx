@@ -22,18 +22,6 @@ interface FormData {
 interface AboutFormData {
   descriptionEn: string;
   descriptionHe: string;
-  contemporaryTitleEn: string;
-  contemporaryTitleHe: string;
-  contemporaryDescEn: string;
-  contemporaryDescHe: string;
-  authenticTitleEn: string;
-  authenticTitleHe: string;
-  authenticDescEn: string;
-  authenticDescHe: string;
-  accessibleTitleEn: string;
-  accessibleTitleHe: string;
-  accessibleDescEn: string;
-  accessibleDescHe: string;
 }
 
 export const AdminPanel = () => {
@@ -76,18 +64,6 @@ export const AdminPanel = () => {
   const [aboutFormData, setAboutFormData] = useState<AboutFormData>({
     descriptionEn: '',
     descriptionHe: '',
-    contemporaryTitleEn: '',
-    contemporaryTitleHe: '',
-    contemporaryDescEn: '',
-    contemporaryDescHe: '',
-    authenticTitleEn: '',
-    authenticTitleHe: '',
-    authenticDescEn: '',
-    authenticDescHe: '',
-    accessibleTitleEn: '',
-    accessibleTitleHe: '',
-    accessibleDescEn: '',
-    accessibleDescHe: '',
   });
 
   useEffect(() => {
@@ -123,18 +99,6 @@ export const AdminPanel = () => {
         setAboutFormData({
           descriptionEn: aboutData.description.en,
           descriptionHe: aboutData.description.he,
-          contemporaryTitleEn: aboutData.features.contemporary.title.en,
-          contemporaryTitleHe: aboutData.features.contemporary.title.he,
-          contemporaryDescEn: aboutData.features.contemporary.description.en,
-          contemporaryDescHe: aboutData.features.contemporary.description.he,
-          authenticTitleEn: aboutData.features.authentic.title.en,
-          authenticTitleHe: aboutData.features.authentic.title.he,
-          authenticDescEn: aboutData.features.authentic.description.en,
-          authenticDescHe: aboutData.features.authentic.description.he,
-          accessibleTitleEn: aboutData.features.accessible.title.en,
-          accessibleTitleHe: aboutData.features.accessible.title.he,
-          accessibleDescEn: aboutData.features.accessible.description.en,
-          accessibleDescHe: aboutData.features.accessible.description.he,
         });
       }
     } catch (error) {
@@ -266,34 +230,16 @@ export const AdminPanel = () => {
         },
         features: {
           contemporary: {
-            title: {
-              en: aboutFormData.contemporaryTitleEn,
-              he: aboutFormData.contemporaryTitleHe,
-            },
-            description: {
-              en: aboutFormData.contemporaryDescEn,
-              he: aboutFormData.contemporaryDescHe,
-            },
+            title: { en: '', he: '' },
+            description: { en: '', he: '' },
           },
           authentic: {
-            title: {
-              en: aboutFormData.authenticTitleEn,
-              he: aboutFormData.authenticTitleHe,
-            },
-            description: {
-              en: aboutFormData.authenticDescEn,
-              he: aboutFormData.authenticDescHe,
-            },
+            title: { en: '', he: '' },
+            description: { en: '', he: '' },
           },
           accessible: {
-            title: {
-              en: aboutFormData.accessibleTitleEn,
-              he: aboutFormData.accessibleTitleHe,
-            },
-            description: {
-              en: aboutFormData.accessibleDescEn,
-              he: aboutFormData.accessibleDescHe,
-            },
+            title: { en: '', he: '' },
+            description: { en: '', he: '' },
           },
         },
       });
@@ -640,158 +586,6 @@ export const AdminPanel = () => {
                 </div>
               </div>
 
-              {/* Contemporary Feature */}
-              <div>
-                <h4 className="text-md font-light mb-3 border-b pb-2">Contemporary Feature</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (EN)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.contemporaryTitleEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, contemporaryTitleEn: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (HE)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.contemporaryTitleHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, contemporaryTitleHe: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (EN)</label>
-                    <textarea
-                      value={aboutFormData.contemporaryDescEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, contemporaryDescEn: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (HE)</label>
-                    <textarea
-                      value={aboutFormData.contemporaryDescHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, contemporaryDescHe: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Authentic Feature */}
-              <div>
-                <h4 className="text-md font-light mb-3 border-b pb-2">Authentic Feature</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (EN)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.authenticTitleEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, authenticTitleEn: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (HE)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.authenticTitleHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, authenticTitleHe: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (EN)</label>
-                    <textarea
-                      value={aboutFormData.authenticDescEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, authenticDescEn: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (HE)</label>
-                    <textarea
-                      value={aboutFormData.authenticDescHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, authenticDescHe: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Accessible Feature */}
-              <div>
-                <h4 className="text-md font-light mb-3 border-b pb-2">Accessible Feature</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (EN)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.accessibleTitleEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, accessibleTitleEn: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Title (HE)</label>
-                    <input
-                      type="text"
-                      value={aboutFormData.accessibleTitleHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, accessibleTitleHe: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (EN)</label>
-                    <textarea
-                      value={aboutFormData.accessibleDescEn}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, accessibleDescEn: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-light mb-2">Description (HE)</label>
-                    <textarea
-                      value={aboutFormData.accessibleDescHe}
-                      onChange={(e) =>
-                        setAboutFormData({ ...aboutFormData, accessibleDescHe: e.target.value })
-                      }
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                </div>
-              </div>
 
               <div className="flex gap-4 pt-4 border-t">
                 <motion.button
