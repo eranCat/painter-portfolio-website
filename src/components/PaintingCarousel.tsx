@@ -27,14 +27,23 @@ export const PaintingCarousel = () => {
     loadPaintings();
   }, []);
 
-  // Load image with fallback for CORS-restricted images
+  // Load image with CORS proxy for restricted images
   useEffect(() => {
     if (paintings.length === 0) return;
 
     const currentPainting = paintings[currentIndex];
     setImageUrl(''); // Reset before loading new image
 
-    // Try canvas-based approach first (works with CORS-enabled images)
+    // Use CORS proxy for ImgBB and other restricted images
+    const getCorsProxyUrl = (url: string): string => {
+      // If it's a Firebase Storage URL (no CORS issues), use as-is
+      if (url.includes('firebasestorage.googleapis.com')) {
+        return url;
+      }
+      // For other URLs (ImgBB, etc.), use CORS proxy
+      return `https://cors-anywhere.herokuapp.com/${url}`;
+    };
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
 
@@ -68,21 +77,22 @@ export const PaintingCarousel = () => {
         }
       } catch (error) {
         console.warn('Canvas approach failed, using direct image URL:', error);
-        // Fallback: use image directly (may show CORS warning but will still display)
+        // Fallback: use direct image
         setImageUrl(currentPainting.imageUrl);
       }
     };
 
     img.onerror = () => {
       console.warn(
-        'Canvas load failed for image, attempting direct load:',
+        'Failed to load image with proxy, using direct URL:',
         currentPainting.imageUrl
       );
-      // Fallback to direct image URL even if CORS fails
+      // Fallback to direct image URL
       setImageUrl(currentPainting.imageUrl);
     };
 
-    img.src = currentPainting.imageUrl;
+    // Try with proxy first
+    img.src = getCorsProxyUrl(currentPainting.imageUrl);
   }, [currentIndex, paintings]);
 
   const goToPrevious = () => {

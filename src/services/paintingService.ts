@@ -11,65 +11,10 @@ import {
   orderBy,
   Timestamp,
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from './firebaseConfig';
+import { db } from './firebaseConfig';
 import { Painting, PaintingFormData } from '../types/painting';
 
 const PAINTINGS_COLLECTION = 'paintings';
-
-// Upload image file to Firebase Storage
-export const uploadPaintingImage = async (file: File): Promise<string> => {
-  try {
-    // Create a unique filename with timestamp
-    const timestamp = Date.now();
-    const filename = `${timestamp}_${file.name}`;
-    const storageRef = ref(storage, `paintings/${filename}`);
-
-    // Upload the file
-    const snapshot = await uploadBytes(storageRef, file);
-
-    // Get the download URL
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    return downloadUrl;
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    throw error;
-  }
-};
-
-// Delete image from Firebase Storage
-export const deletePaintingImage = async (imageUrl: string): Promise<void> => {
-  try {
-    // Only delete if it's a Firebase Storage URL
-    if (!imageUrl.includes('firebasestorage.googleapis.com')) {
-      return;
-    }
-
-    // Extract the storage path from the URL
-    const url = new URL(imageUrl);
-    const pathStart = url.pathname.indexOf('/o/') + 3;
-    const pathEnd = url.pathname.indexOf('?');
-    const encodedPath = url.pathname.substring(pathStart, pathEnd);
-    const decodedPath = decodeURIComponent(encodedPath);
-
-    const fileRef = ref(storage, decodedPath);
-    await deleteObject(fileRef);
-  } catch (error) {
-    console.warn('Could not delete image from storage:', error);
-    // Don't throw error as image data can be cleaned up by other means
-  }
-};
-
-// Convert file to image URL (accepts both File objects and URL strings)
-export const getImageUrl = async (imageInput: File | string): Promise<string> => {
-  // If it's already a URL string, return it as-is
-  if (typeof imageInput === 'string') {
-    return imageInput;
-  }
-
-  // If it's a File, upload to Firebase Storage
-  return uploadPaintingImage(imageInput);
-};
 
 // Add a new painting
 export const addPainting = async (paintingData: PaintingFormData, imageUrl: string) => {
