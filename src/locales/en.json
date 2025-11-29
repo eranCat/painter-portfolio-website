@@ -13,7 +13,7 @@
   },
   "about": {
     "description": "Welcome to my contemporary art portfolio. I create vibrant, thought-provoking paintings that explore the intersection of emotion and abstraction. Each piece is a unique expression of my artistic vision, crafted with passion and precision. Browse my gallery to discover works that challenge perception and inspire contemplation.",
-    "artistName": "David Paz Gideon"
+    "artistName": "David Paz Gedon"
   },
   "features": {
     "contemporary": "Contemporary",
@@ -28,7 +28,7 @@
     "instagram": "Instagram",
     "facebook": "Facebook",
     "contact": "Contact",
-    "copyrightArtist": "© {{year}} David Paz Gideon. All rights reserved."
+    "copyrightArtist": "© {{year}} David Paz Gedon. All rights reserved."
   },
   "contact": {
     "title": "Get in Touch",

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '../hooks/useLanguage';
+import { DrawingLine, DrawingCircle } from './DrawingAnimation';
 
 export const Hero = () => {
   const { t } = useLanguage();
@@ -17,6 +18,28 @@ export const Hero = () => {
         transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
         className="absolute inset-0 bg-gradient-to-t from-transparent via-purple-500/10 to-transparent"
       />
+
+      {/* Decorative drawing animations */}
+      <svg
+        className="absolute top-20 left-10 w-32 h-32 opacity-20"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <DrawingCircle cx={100} cy={100} r={80} stroke="#a855f7" strokeWidth={2} delay={0} duration={2} />
+        <DrawingCircle cx={100} cy={100} r={50} stroke="#3b82f6" strokeWidth={2} delay={0.3} duration={2} />
+        <DrawingLine x1={20} y1={100} x2={180} y2={100} stroke="#a855f7" strokeWidth={1} delay={0.6} duration={1.5} />
+        <DrawingLine x1={100} y1={20} x2={100} y2={180} stroke="#a855f7" strokeWidth={1} delay={0.6} duration={1.5} />
+      </svg>
+
+      <svg
+        className="absolute bottom-20 right-10 w-40 h-40 opacity-20"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <DrawingCircle cx={100} cy={100} r={70} stroke="#3b82f6" strokeWidth={2} delay={0.5} duration={2} />
+        <DrawingLine x1={30} y1={30} x2={170} y2={170} stroke="#3b82f6" strokeWidth={1.5} delay={1} duration={1.8} />
+        <DrawingLine x1={170} y1={30} x2={30} y2={170} stroke="#3b82f6" strokeWidth={1.5} delay={1} duration={1.8} />
+      </svg>
 
       <div className="relative z-10 text-center text-white px-4">
         <motion.h1

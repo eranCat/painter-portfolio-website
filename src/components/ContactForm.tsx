@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { ContactFormData } from '../types/contact';
 import { addContact } from '../services/contactService';
+import { DrawingLine, DrawingCircle, AnimatedPath } from './DrawingAnimation';
 
 export const ContactForm = () => {
   const { t, isRTL } = useLanguage();
@@ -53,15 +54,36 @@ export const ContactForm = () => {
   };
 
   return (
-    <motion.form
-      onSubmit={handleSubmit}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className={`max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-6 ${
-        isRTL ? 'rtl' : 'ltr'
-      }`}
-    >
+    <div className="relative">
+      {/* Decorative animations */}
+      <svg
+        className="absolute -top-16 left-1/4 w-32 h-32 opacity-10 pointer-events-none"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <DrawingCircle cx={100} cy={100} r={80} stroke="#ec4899" strokeWidth={2} delay={0} duration={2.5} />
+        <DrawingLine x1={20} y1={100} x2={180} y2={100} stroke="#ec4899" strokeWidth={1.5} delay={0.7} duration={2} />
+      </svg>
+
+      <svg
+        className="absolute -bottom-16 right-1/4 w-40 h-40 opacity-10 pointer-events-none"
+        viewBox="0 0 200 200"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <DrawingCircle cx={100} cy={100} r={70} stroke="#06b6d4" strokeWidth={2} delay={0.3} duration={2.5} />
+        <DrawingCircle cx={100} cy={100} r={40} stroke="#ec4899" strokeWidth={1.5} delay={0.8} duration={2} />
+        <AnimatedPath d="M 100 30 Q 140 70 100 100 Q 60 130 100 170" stroke="#06b6d4" strokeWidth={1} delay={1.2} duration={2.5} />
+      </svg>
+
+      <motion.form
+        onSubmit={handleSubmit}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className={`max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-6 relative z-10 ${
+          isRTL ? 'rtl' : 'ltr'
+        }`}
+      >
       {submitted && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -137,5 +159,6 @@ export const ContactForm = () => {
         {t('contact.send')}
       </motion.button>
     </motion.form>
+    </div>
   );
 };

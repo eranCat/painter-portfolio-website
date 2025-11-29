@@ -68,16 +68,28 @@ export const Gallery3D = () => {
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    // Lighting setup for better wall shadows
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(5, 8, 5);
+    // Main directional light with shadow
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight.position.set(6, 9, 6);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 2048;
     directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = 0.1;
+    directionalLight.shadow.camera.far = 50;
+    directionalLight.shadow.camera.left = -15;
+    directionalLight.shadow.camera.right = 15;
+    directionalLight.shadow.camera.top = 15;
+    directionalLight.shadow.camera.bottom = -15;
     scene.add(directionalLight);
+
+    // Fill light from opposite direction for subtle fill
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.25);
+    fillLight.position.set(-5, 6, -5);
+    scene.add(fillLight);
 
     // Floor
     const floorGeometry = new THREE.PlaneGeometry(20, 20);
@@ -91,13 +103,15 @@ export const Gallery3D = () => {
     const ceilingGeometry = new THREE.PlaneGeometry(20, 20);
     const ceilingMaterial = new THREE.MeshLambertMaterial({ color: 0xfafafa });
     const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
-    ceiling.position.y = 3;
+    ceiling.position.y = 4;
     ceiling.rotation.x = Math.PI / 2;
     ceiling.receiveShadow = true;
     scene.add(ceiling);
 
     // Create 4 walls with paintings
     const wallDistance = 9;
+    const wallHeight = 4.5; // Increased wall height
+    const wallWidth = 20;
     const wallPositions = [
       { x: 0, z: wallDistance, rotY: 0, name: 'back' },
       { x: wallDistance, z: 0, rotY: Math.PI / 2, name: 'right' },
@@ -105,53 +119,87 @@ export const Gallery3D = () => {
       { x: -wallDistance, z: 0, rotY: -Math.PI / 2, name: 'left' },
     ];
 
-    const textureLoader = new THREE.TextureLoader();
-
     wallPositions.forEach((wallPos) => {
-      const wallGeometry = new THREE.PlaneGeometry(20, 15);
-      const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      // Create textured wall with color gradient
+      const wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
+      const wallMaterial = new THREE.MeshStandardMaterial({
+        color: 0xf5f5f0,
+        metalness: 0.05,
+        roughness: 0.95,
+      });
       const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-      wall.position.set(wallPos.x, 4, wallPos.z);
+      wall.position.set(wallPos.x, wallHeight / 2, wallPos.z);
       wall.rotation.y = wallPos.rotY;
+      wall.castShadow = true;
       wall.receiveShadow = true;
       scene.add(wall);
 
-      // Add paintings to wall
+      // Add subtle wall edge shadow for depth
+      const edgeGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
+      const edgeMaterial = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        metalness: 0,
+        roughness: 1,
+        transparent: true,
+        opacity: 0.08,
+      });
+      const edgeMesh = new THREE.Mesh(edgeGeometry, edgeMaterial);
+      edgeMesh.position.copy(wall.position);
+      edgeMesh.rotation.copy(wall.rotation);
+      edgeMesh.position.z += 0.001;
+      scene.add(edgeMesh);
+
+      // Add paintings to wall with dynamic grid layout
       const wallPaintings = getWallPaintings(wallPos.name, paintings);
+
+      // Calculate grid layout (2-3 columns depending on number of paintings)
+      const itemsPerRow = wallPaintings.length <= 3 ? wallPaintings.length : Math.ceil(Math.sqrt(wallPaintings.length));
+      const rowCount = Math.ceil(wallPaintings.length / itemsPerRow);
+
+      const frameWidth = 2.0;
+      const frameHeight = 2.5;
+      const horizontalSpacing = 3.5;
+      const verticalSpacing = 3.2;
+
+      // Calculate starting positions to center the grid
+      const gridWidth = (itemsPerRow - 1) * horizontalSpacing;
+      const gridHeight = (rowCount - 1) * verticalSpacing;
+      const startX = -gridWidth / 2;
+      const startY = 2.5 - (gridHeight / 2); // Center vertically on wall
+
       wallPaintings.forEach((painting, index) => {
-        const frameWidth = 2.5;
-        const frameHeight = 3;
+        const col = index % itemsPerRow;
+        const row = Math.floor(index / itemsPerRow);
+
+        const xPos = startX + col * horizontalSpacing;
+        const yPos = startY + row * verticalSpacing;
+
         const frameGeometry = new THREE.BoxGeometry(frameWidth, frameHeight, 0.05);
         const frameMaterial = new THREE.MeshStandardMaterial({
           color: 0xf5f5f5,
-          metalness: 0.1,
-          roughness: 0.8,
+          metalness: 0.15,
+          roughness: 0.75,
         });
 
         const frame = new THREE.Mesh(frameGeometry, frameMaterial);
         frame.castShadow = true;
         frame.receiveShadow = true;
 
-        // Position paintings on wall
-        const totalPaintings = wallPaintings.length;
-        const spacing = 5;
-        const startX = -(spacing * (totalPaintings - 1)) / 2;
-        const xPos = startX + index * spacing;
-
+        // Position paintings on wall based on orientation
         if (wallPos.rotY === 0) {
           // Back wall
-          frame.position.set(xPos, 3.5, wallDistance - 0.03);
+          frame.position.set(xPos, yPos, wallDistance - 0.03);
         } else if (wallPos.rotY === Math.PI / 2) {
           // Right wall
-          frame.position.set(wallDistance - 0.03, 3.5, -xPos);
+          frame.position.set(wallDistance - 0.03, yPos, -xPos);
           frame.rotation.y = Math.PI / 2;
         } else if (wallPos.rotY === Math.PI) {
           // Front wall
-          frame.position.set(-xPos, 3.5, -wallDistance + 0.03);
+          frame.position.set(-xPos, yPos, -wallDistance + 0.03);
           frame.rotation.y = Math.PI;
         } else {
           // Left wall
-          frame.position.set(-wallDistance + 0.03, 3.5, xPos);
+          frame.position.set(-wallDistance + 0.03, yPos, xPos);
           frame.rotation.y = -Math.PI / 2;
         }
 
