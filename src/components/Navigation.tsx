@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 
 export const Navigation = () => {
-  const { t, language, switchLanguage } = useLanguage();
+  const { t, language, switchLanguage, isRTL } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
@@ -20,13 +20,13 @@ export const Navigation = () => {
       className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className={`flex justify-between items-center h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <Link to="/" className="text-2xl font-light tracking-wider">
             David Paz Gideon
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className={`hidden md:flex items-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-8' : 'space-x-8'}`}>
             {navItems.map((item) => (
               <a
                 key={item.label}
@@ -74,7 +74,7 @@ export const Navigation = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-200"
+            className={`md:hidden border-t border-gray-200 ${isRTL ? 'rtl' : 'ltr'}`}
           >
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
