@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTheme } from '../contexts/ThemeContext';
 import { getPaintings } from '../services/paintingService';
 import { Painting } from '../types/painting';
 
 export const PaintingCarousel = () => {
   const { t, isRTL, language } = useLanguage();
+  const { theme } = useTheme();
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -119,10 +121,13 @@ export const PaintingCarousel = () => {
 
   if (loading) {
     return (
-      <div className="h-96 md:h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-96 md:h-screen flex items-center justify-center" style={{ backgroundColor: theme.background }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('common.loading')}</p>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+            style={{ borderBottomColor: theme.primary }}
+          ></div>
+          <p style={{ color: theme.textSecondary }}>{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -130,8 +135,8 @@ export const PaintingCarousel = () => {
 
   if (paintings.length === 0) {
     return (
-      <div className="h-96 md:h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500">{t('gallery.noPaintings')}</p>
+      <div className="h-96 md:h-screen flex items-center justify-center" style={{ backgroundColor: theme.background }}>
+        <p style={{ color: theme.textSecondary }}>{t('gallery.noPaintings')}</p>
       </div>
     );
   }
@@ -144,13 +149,16 @@ export const PaintingCarousel = () => {
       : currentPainting.description.en;
 
   return (
-    <div className={`bg-white py-12 md:py-20 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`py-12 md:py-20 ${isRTL ? 'rtl' : 'ltr'}`} style={{ backgroundColor: theme.background }}>
       <div className="max-w-6xl mx-auto px-4">
         {/* Carousel container */}
         <div className="flex flex-col lg:flex-row gap-8 items-center">
           {/* Image section */}
           <div className="w-full lg:w-2/3">
-            <div className="relative bg-gray-900 rounded-lg overflow-hidden shadow-lg aspect-[4/3] md:aspect-auto md:h-96 lg:h-[600px]">
+            <div
+              className="relative rounded-lg overflow-hidden shadow-lg aspect-[4/3] md:aspect-auto md:h-96 lg:h-[600px]"
+              style={{ backgroundColor: theme.mode === 'dark' ? '#0a0a0a' : '#f5f3f0' }}
+            >
               <AnimatePresence mode="wait">
                 {imageUrl ? (
                   <motion.img
@@ -181,7 +189,13 @@ export const PaintingCarousel = () => {
               </AnimatePresence>
 
               {/* Image counter */}
-              <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm font-medium">
+              <div
+                className="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium"
+                style={{
+                  backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
+                  color: theme.mode === 'dark' ? '#fff' : '#000'
+                }}
+              >
                 {currentIndex + 1} / {paintings.length}
               </div>
             </div>
@@ -192,7 +206,10 @@ export const PaintingCarousel = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={goToPrevious}
-                className="p-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md"
+                className="p-3 rounded-full text-white transition-colors shadow-md"
+                style={{ backgroundColor: theme.primary }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
                 aria-label={t('carousel.previous')}
               >
                 <svg
@@ -214,7 +231,10 @@ export const PaintingCarousel = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={goToNext}
-                className="p-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md"
+                className="p-3 rounded-full text-white transition-colors shadow-md"
+                style={{ backgroundColor: theme.primary }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
                 aria-label={t('carousel.next')}
               >
                 <svg
@@ -244,21 +264,21 @@ export const PaintingCarousel = () => {
           >
             <div className="space-y-4">
               <div>
-                <h3 className="text-3xl md:text-4xl font-light mb-2">
+                <h3 className="text-3xl md:text-4xl font-light mb-2" style={{ color: theme.text }}>
                   {paintingTitle}
                 </h3>
-                <p className="text-indigo-600 font-medium">{currentPainting.year}</p>
+                <p className="font-medium" style={{ color: theme.primary }}>{currentPainting.year}</p>
               </div>
 
               <div className="space-y-2">
-                <p className="text-gray-600 leading-relaxed">
+                <p className="leading-relaxed" style={{ color: theme.textSecondary }}>
                   {paintingDescription}
                 </p>
               </div>
 
               {imageDimensions && (
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-400">
+                <div className="pt-4" style={{ borderTop: `1px solid ${theme.border}` }}>
+                  <p className="text-sm" style={{ color: theme.textSecondary }}>
                     {imageDimensions.width} × {imageDimensions.height} px
                   </p>
                 </div>
@@ -275,10 +295,13 @@ export const PaintingCarousel = () => {
               onClick={() => goToSlide(index)}
               className={`transition-all rounded-full ${
                 index === currentIndex
-                  ? 'w-8 bg-indigo-600'
+                  ? 'w-8'
                   : 'w-3 bg-gray-300 hover:bg-gray-400'
               }`}
-              style={{ height: '12px' }}
+              style={{
+                height: '12px',
+                backgroundColor: index === currentIndex ? theme.primary : undefined
+              }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               aria-label={`${t('carousel.goToSlide')} ${index + 1}`}

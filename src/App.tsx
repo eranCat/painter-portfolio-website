@@ -4,6 +4,7 @@ import { useLanguage } from './hooks/useLanguage';
 import { Navigation } from './components/Navigation';
 import { HomePage } from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
+import { ThemeSelector } from './components/ThemeSelector';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           {/* Catch-all route for hash fragments and undefined routes */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ThemeSelector />
       </div>
     </Router>
   );

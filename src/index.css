@@ -5,6 +5,31 @@
 @layer base {
   body {
     @apply font-sans text-gray-800;
+    background-color: #f9f6f0;
+    background-image:
+      /* Canvas weave texture */
+      repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 115, 85, 0.03) 1px, rgba(139, 115, 85, 0.03) 2px),
+      repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(139, 115, 85, 0.03) 1px, rgba(139, 115, 85, 0.03) 2px),
+      /* Slightly larger texture for depth */
+      repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(139, 115, 85, 0.01) 35px, rgba(139, 115, 85, 0.01) 70px),
+      repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(139, 115, 85, 0.01) 35px, rgba(139, 115, 85, 0.01) 70px);
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%;
+    background-attachment: fixed;
+  }
+
+  body.dark {
+    background-color: #1a1a1a;
+    background-image:
+      /* Canvas weave texture for dark mode */
+      repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255, 255, 255, 0.03) 1px, rgba(255, 255, 255, 0.03) 2px),
+      repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255, 255, 255, 0.03) 1px, rgba(255, 255, 255, 0.03) 2px),
+      /* Slightly larger texture for depth */
+      repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.01) 35px, rgba(255, 255, 255, 0.01) 70px),
+      repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.01) 35px, rgba(255, 255, 255, 0.01) 70px);
   }
 
   h1, h2, h3, h4, h5, h6 {

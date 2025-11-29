@@ -2,6 +2,7 @@ import { PaintingCarousel } from '../components/PaintingCarousel';
 import { ContactForm } from '../components/ContactForm';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTheme } from '../contexts/ThemeContext';
 import { useState, useEffect } from 'react';
 import { getAbout } from '../services/aboutService';
 import { About } from '../types/about';
@@ -9,6 +10,7 @@ import { DrawingLine, DrawingCircle, DrawingRect } from '../components/DrawingAn
 
 export const HomePage = () => {
   const { t, isRTL } = useLanguage();
+  const { theme } = useTheme();
   const [about, setAbout] = useState<About | null>(null);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export const HomePage = () => {
 
   return (
     <main>
-      <section id="about" className="py-20 bg-gray-50 relative">
+      <section id="about" className="py-20 relative" style={{ backgroundColor: theme.backgroundSecondary }}>
         <div className={`max-w-4xl mx-auto px-4 ${isRTL ? 'rtl' : 'ltr'}`}>
           {/* Decorative corner animations */}
           <svg
@@ -55,10 +57,10 @@ export const HomePage = () => {
             viewport={{ once: true }}
             className="space-y-6 relative z-10"
           >
-            <h2 className="text-4xl md:text-5xl font-light mb-8">
+            <h2 className="text-4xl md:text-5xl font-light mb-8" style={{ color: theme.text }}>
               {t('nav.about')}
             </h2>
-            <p className="text-lg text-gray-700 leading-relaxed">
+            <p className="text-lg leading-relaxed" style={{ color: theme.textSecondary }}>
               {about
                 ? (isRTL ? about.description.he : about.description.en)
                 : t('about.description')}
@@ -88,8 +90,8 @@ export const HomePage = () => {
                     transition={{ delay: idx * 0.1 }}
                     className="text-center"
                   >
-                    <h3 className="text-xl font-light mb-2">{item.title}</h3>
-                    <p className="text-gray-600">{item.description}</p>
+                    <h3 className="text-xl font-light mb-2" style={{ color: theme.text }}>{item.title}</h3>
+                    <p style={{ color: theme.textSecondary }}>{item.description}</p>
                   </motion.div>
                 ))
               ) : (
@@ -115,8 +117,8 @@ export const HomePage = () => {
                     transition={{ delay: idx * 0.1 }}
                     className="text-center"
                   >
-                    <h3 className="text-xl font-light mb-2">{t(item.titleKey)}</h3>
-                    <p className="text-gray-600">{t(item.descKey)}</p>
+                    <h3 className="text-xl font-light mb-2" style={{ color: theme.text }}>{t(item.titleKey)}</h3>
+                    <p style={{ color: theme.textSecondary }}>{t(item.descKey)}</p>
                   </motion.div>
                 ))
               )}
@@ -125,17 +127,18 @@ export const HomePage = () => {
         </div>
       </section>
 
-      <section id="gallery" className="bg-white">
+      <section id="gallery" style={{ backgroundColor: theme.background }}>
         <PaintingCarousel />
       </section>
 
-      <section id="contact" className="py-20 bg-white">
+      <section id="contact" className="py-20" style={{ backgroundColor: theme.background }}>
         <div className="max-w-4xl mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-light text-center mb-16"
+            style={{ color: theme.text }}
           >
             {t('nav.contact')}
           </motion.h2>
@@ -144,7 +147,7 @@ export const HomePage = () => {
       </section>
 
       <footer className={`bg-black text-white py-12 ${isRTL ? 'rtl' : 'ltr'}`}>
-        <div className="max-w-7xl mx-auto px-4 text-center space-y-4">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -152,17 +155,6 @@ export const HomePage = () => {
           >
             {t('footer.copyrightArtist').replace('{{year}}', new Date().getFullYear().toString())}
           </motion.p>
-          <div className="flex justify-center gap-6">
-            <a href="#gallery" className="text-gray-400 hover:text-white transition-colors text-sm">
-              {t('footer.instagram')}
-            </a>
-            <a href="#about" className="text-gray-400 hover:text-white transition-colors text-sm">
-              {t('footer.facebook')}
-            </a>
-            <a href="#contact" className="text-gray-400 hover:text-white transition-colors text-sm">
-              {t('footer.contact')}
-            </a>
-          </div>
         </div>
       </footer>
     </main>

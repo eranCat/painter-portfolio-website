@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTheme } from '../contexts/ThemeContext';
 import { ContactFormData } from '../types/contact';
 import { addContact } from '../services/contactService';
 import { DrawingLine, DrawingCircle, AnimatedPath } from './DrawingAnimation';
 
 export const ContactForm = () => {
   const { t, isRTL } = useLanguage();
+  const { theme } = useTheme();
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -80,16 +82,24 @@ export const ContactForm = () => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className={`max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg space-y-6 relative z-10 ${
+        className={`max-w-2xl mx-auto p-8 rounded-lg shadow-lg space-y-6 relative z-10 ${
           isRTL ? 'rtl' : 'ltr'
         }`}
+        style={{
+          backgroundColor: theme.cardBg,
+          color: theme.text,
+        }}
       >
       {submitted && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="p-4 bg-green-100 text-green-700 rounded-lg"
+          className="p-4 rounded-lg"
+          style={{
+            backgroundColor: theme.mode === 'light' ? '#dcfce7' : '#064e3b',
+            color: theme.mode === 'light' ? '#166534' : '#86efac',
+          }}
         >
           {t('contact.success')}
         </motion.div>
@@ -99,7 +109,11 @@ export const ContactForm = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-red-100 text-red-700 rounded-lg"
+          className="p-4 rounded-lg"
+          style={{
+            backgroundColor: theme.mode === 'light' ? '#fee2e2' : '#7f1d1d',
+            color: theme.mode === 'light' ? '#991b1b' : '#fecaca',
+          }}
         >
           {error}
         </motion.div>
@@ -114,7 +128,20 @@ export const ContactForm = () => {
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition-all"
+          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all"
+          style={{
+            borderColor: theme.border,
+            backgroundColor: theme.mode === 'light' ? '#fff' : '#1a1a1a',
+            color: theme.text,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = theme.primary;
+            e.currentTarget.style.boxShadow = `0 0 0 2px rgba(139, 115, 85, 0.3)`;
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = theme.border;
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
 
         <motion.input
@@ -125,7 +152,20 @@ export const ContactForm = () => {
           value={formData.email}
           onChange={handleChange}
           required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition-all"
+          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all"
+          style={{
+            borderColor: theme.border,
+            backgroundColor: theme.mode === 'light' ? '#fff' : '#1a1a1a',
+            color: theme.text,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = theme.primary;
+            e.currentTarget.style.boxShadow = `0 0 0 2px rgba(139, 115, 85, 0.3)`;
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = theme.border;
+            e.currentTarget.style.boxShadow = 'none';
+          }}
         />
       </div>
 
@@ -136,7 +176,20 @@ export const ContactForm = () => {
         placeholder={t('contact.phone')}
         value={formData.phone}
         onChange={handleChange}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition-all"
+        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all"
+        style={{
+          borderColor: theme.border,
+          backgroundColor: theme.mode === 'light' ? '#fff' : '#1a1a1a',
+          color: theme.text,
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = theme.primary;
+          e.currentTarget.style.boxShadow = `0 0 0 2px rgba(139, 115, 85, 0.3)`;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = theme.border;
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       />
 
       <motion.textarea
@@ -147,14 +200,37 @@ export const ContactForm = () => {
         onChange={handleChange}
         required
         rows={6}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition-all resize-none"
+        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all resize-none"
+        style={{
+          borderColor: theme.border,
+          backgroundColor: theme.mode === 'light' ? '#fff' : '#1a1a1a',
+          color: theme.text,
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = theme.primary;
+          e.currentTarget.style.boxShadow = `0 0 0 2px rgba(139, 115, 85, 0.3)`;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = theme.border;
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       />
 
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         type="submit"
-        className="w-full bg-black text-white py-3 rounded-lg font-light tracking-wider hover:bg-gray-800 transition-colors"
+        className="w-full py-3 rounded-lg font-light tracking-wider transition-colors"
+        style={{
+          backgroundColor: theme.primary,
+          color: theme.cardBg,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = theme.primaryHover;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = theme.primary;
+        }}
       >
         {t('contact.send')}
       </motion.button>
