@@ -41,7 +41,8 @@ export const PaintingCarousel = () => {
         return url;
       }
       // For other URLs (ImgBB, etc.), use CORS proxy
-      return `https://cors-anywhere.herokuapp.com/${url}`;
+      // Using api.allorigins.win which is more reliable than cors-anywhere
+      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
     };
 
     const img = new Image();
