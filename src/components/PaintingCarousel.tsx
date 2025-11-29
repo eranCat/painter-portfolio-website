@@ -10,7 +10,6 @@ export const PaintingCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string>('');
-  const containerRef = useRef<HTMLDivElement>(null);
 
   // Load paintings from Firebase
   useEffect(() => {
