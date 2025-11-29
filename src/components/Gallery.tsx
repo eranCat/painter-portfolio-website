@@ -29,6 +29,7 @@ export const Gallery = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
 
   useEffect(() => {
     const loadPaintings = async () => {
@@ -76,6 +77,7 @@ export const Gallery = () => {
           variants={itemVariants}
           onMouseEnter={() => setHoveredId(painting.id)}
           onMouseLeave={() => setHoveredId(null)}
+          onClick={() => setSelectedPainting(painting)}
           className="cursor-pointer overflow-hidden rounded-lg shadow-lg bg-white"
         >
           <div className="relative overflow-hidden h-64">
@@ -109,6 +111,48 @@ export const Gallery = () => {
           </motion.div>
         </motion.div>
       ))}
+
+      {selectedPainting && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedPainting(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="bg-white rounded-lg overflow-hidden max-w-4xl w-full max-h-screen flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex-1 overflow-hidden bg-gray-100 flex items-center justify-center">
+              <img
+                src={selectedPainting.imageUrl}
+                alt={selectedPainting.title.en}
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+            <div className="p-6 border-t border-gray-200">
+              <h2 className="text-2xl font-light mb-2">{selectedPainting.title.en}</h2>
+              <p className="text-gray-500 text-sm mb-3">{selectedPainting.year}</p>
+              <p className="text-gray-600 mb-4">{selectedPainting.description.en}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500">{selectedPainting.dimensions}</p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedPainting(null)}
+                  className="px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
+                >
+                  Close
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
