@@ -26,6 +26,9 @@ export const AdminPanel = () => {
     year: new Date().getFullYear(),
     price: 0,
     dimensions: '',
+    dimensionWidth: '',
+    dimensionHeight: '',
+    dimensionUnit: 'cm',
   });
 
   useEffect(() => {
@@ -87,12 +90,31 @@ export const AdminPanel = () => {
       year: new Date().getFullYear(),
       price: 0,
       dimensions: '',
+      dimensionWidth: '',
+      dimensionHeight: '',
+      dimensionUnit: 'cm',
     });
     setShowForm(true);
   };
 
   const handleEditClick = (painting: Painting) => {
     setEditingId(painting.id);
+    // Parse existing dimensions string (e.g., "100x200cm" -> width: 100, height: 200, unit: cm)
+    let dimensionWidth = '';
+    let dimensionHeight = '';
+    let dimensionUnit = 'cm';
+
+    if (painting.dimensions) {
+      const dimensionMatch = painting.dimensions.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)(?:\s*([a-z%]+))?$/i);
+      if (dimensionMatch) {
+        dimensionWidth = dimensionMatch[1];
+        dimensionHeight = dimensionMatch[2];
+        if (dimensionMatch[3]) {
+          dimensionUnit = dimensionMatch[3];
+        }
+      }
+    }
+
     setFormData({
       titleEn: painting.title.en,
       titleHe: painting.title.he,
@@ -104,6 +126,9 @@ export const AdminPanel = () => {
       year: painting.year,
       price: painting.price,
       dimensions: painting.dimensions,
+      dimensionWidth,
+      dimensionHeight,
+      dimensionUnit,
     });
     setShowForm(true);
   };
@@ -120,6 +145,15 @@ export const AdminPanel = () => {
         return;
       }
 
+      // Build dimensions string from separate fields
+      let dimensions = '';
+      if (formData.dimensionWidth || formData.dimensionHeight) {
+        const width = formData.dimensionWidth || 0;
+        const height = formData.dimensionHeight || 0;
+        const unit = formData.dimensionUnit || 'cm';
+        dimensions = `${width}x${height}${unit}`;
+      }
+
       if (editingId) {
         await updatePainting(editingId, {
           title: { en: formData.titleEn, he: formData.titleHe },
@@ -128,7 +162,7 @@ export const AdminPanel = () => {
           category: formData.category,
           year: formData.year,
           price: formData.price,
-          dimensions: formData.dimensions,
+          dimensions,
         });
         const updatedPaintings = paintings.map((p) =>
           p.id === editingId
@@ -140,7 +174,7 @@ export const AdminPanel = () => {
                 category: formData.category,
                 year: formData.year,
                 price: formData.price,
-                dimensions: formData.dimensions,
+                dimensions,
               }
             : p
         );
@@ -155,7 +189,7 @@ export const AdminPanel = () => {
             category: formData.category,
             year: formData.year,
             price: formData.price,
-            dimensions: formData.dimensions,
+            dimensions,
             image: null,
           },
           imageUrl
@@ -471,15 +505,53 @@ export const AdminPanel = () => {
 
               <div>
                 <label className="block text-sm font-light mb-2">Dimensions</label>
-                <input
-                  type="text"
-                  value={formData.dimensions}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dimensions: e.target.value })
-                  }
-                  placeholder="e.g., 100x100cm"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-xs font-light mb-1 text-gray-600">Width</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={formData.dimensionWidth || ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, dimensionWidth: e.target.value })
+                      }
+                      placeholder="e.g., 100"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-light mb-1 text-gray-600">Height</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={formData.dimensionHeight || ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, dimensionHeight: e.target.value })
+                      }
+                      placeholder="e.g., 100"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-light mb-1 text-gray-600">Unit</label>
+                    <select
+                      value={formData.dimensionUnit || 'cm'}
+                      onChange={(e) =>
+                        setFormData({ ...formData, dimensionUnit: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    >
+                      <option value="cm">cm</option>
+                      <option value="in">in</option>
+                      <option value="mm">mm</option>
+                      <option value="m">m</option>
+                      <option value="px">px</option>
+                    </select>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Format: {formData.dimensionWidth || '?'} × {formData.dimensionHeight || '?'} {formData.dimensionUnit || 'cm'}
+                </p>
               </div>
 
               <div className="flex gap-4 pt-4">

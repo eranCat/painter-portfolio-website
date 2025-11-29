@@ -28,4 +28,8 @@ export interface PaintingFormData {
   price: number;
   dimensions: string;
   image: File | null;
+  // Form-specific fields for dimension input
+  dimensionWidth?: number | string;
+  dimensionHeight?: number | string;
+  dimensionUnit?: string;
 }
