@@ -19,8 +19,8 @@ export const getAbout = async (): Promise<About | null> => {
     }
     return null;
   } catch (error) {
-    console.error('Error fetching about:', error);
-    throw error;
+    console.warn('About section not yet configured:', error);
+    return null;
   }
 };
 
