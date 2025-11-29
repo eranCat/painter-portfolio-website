@@ -33,11 +33,12 @@ export const ContactForm = () => {
       // Save to Firebase
       await addContact(formData);
 
-      // Send WhatsApp message automatically
-      const artistPhone = '+9720526948351';
-      const whatsappMessage = `${t('contact.name')}: ${formData.name}\n${t('contact.email')}: ${formData.email}\n${t('contact.phone')}: ${formData.phone}\n\n${t('contact.message')}:\n${formData.message}`;
-      const whatsappUrl = `https://wa.me/${artistPhone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappUrl, '_blank');
+      // Send email automatically
+      const artistEmail = 'davidpazgideon@gmail.com';
+      const emailSubject = `New Contact from ${formData.name}`;
+      const emailBody = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nMessage:\n${formData.message}`;
+      const mailtoUrl = `mailto:${artistEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+      window.location.href = mailtoUrl;
 
       // Show success message
       setSubmitted(true);
