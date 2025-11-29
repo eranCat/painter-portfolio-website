@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting, addPainting, updatePainting, getImageUrl } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
@@ -87,7 +87,7 @@ export const AdminPanel = () => {
       year: new Date().getFullYear(),
       price: 0,
       dimensions: '',
-    } as any);
+    });
     setShowForm(true);
   };
 
@@ -104,7 +104,7 @@ export const AdminPanel = () => {
       year: painting.year,
       price: painting.price,
       dimensions: painting.dimensions,
-    } as any);
+    });
     setShowForm(true);
   };
 
@@ -113,17 +113,10 @@ export const AdminPanel = () => {
     setFormLoading(true);
 
     try {
-      let imageUrl = '';
-
-      // Use file if selected, otherwise use URL
-      if (formData.image) {
-        imageUrl = await getImageUrl(formData.image);
-      } else if (formData.imageUrl) {
-        imageUrl = formData.imageUrl;
-      }
+      const imageUrl = formData.imageUrl;
 
       if (!imageUrl) {
-        alert('Please select an image or provide an image URL');
+        alert('Please provide an image URL');
         return;
       }
 
@@ -421,29 +414,18 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">Image URL or File</label>
+                <label className="block text-sm font-light mb-2">Image URL</label>
                 <input
                   type="text"
-                  placeholder="Paste image URL or select file below"
+                  placeholder="Paste image URL here"
                   value={formData.imageUrl}
                   onChange={(e) =>
                     setFormData({ ...formData, imageUrl: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black mb-2"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setFormData({ ...formData, image: file });
-                    }
-                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Paste an image URL above or select a file to upload (JPG, PNG, GIF). File upload takes priority.
+                  Paste a direct image URL (e.g., https://example.com/image.jpg)
                 </p>
               </div>
 
