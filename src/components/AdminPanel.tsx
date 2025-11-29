@@ -6,6 +6,21 @@ import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
 
+interface FormData {
+  titleEn: string;
+  titleHe: string;
+  descriptionEn: string;
+  descriptionHe: string;
+  imageUrl: string;
+  image: File | null;
+  category: string;
+  year: number;
+  dimensions: string;
+  dimensionWidth: string;
+  dimensionHeight: string;
+  dimensionUnit: string;
+}
+
 export const AdminPanel = () => {
   const { t } = useLanguage();
   const [tab, setTab] = useState<'paintings' | 'contacts'>('paintings');
@@ -15,13 +30,13 @@ export const AdminPanel = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     titleEn: '',
     titleHe: '',
     descriptionEn: '',
     descriptionHe: '',
     imageUrl: '',
-    image: null as File | null,
+    image: null,
     category: 'abstract',
     year: new Date().getFullYear(),
     dimensions: '',
