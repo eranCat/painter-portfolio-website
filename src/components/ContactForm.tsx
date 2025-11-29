@@ -34,7 +34,7 @@ export const ContactForm = () => {
       await addContact(formData);
 
       // Send email automatically
-      const artistEmail = 'davidpazgideon@gmail.com';
+      const artistEmail = 'davidpg126@gmail.com';
       const emailSubject = `New Contact from ${formData.name}`;
       const emailBody = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\nMessage:\n${formData.message}`;
       const mailtoUrl = `mailto:${artistEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
