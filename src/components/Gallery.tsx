@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { getPaintings } from '../services/paintingService';
 import { Painting } from '../types/painting';
+import { useLanguage } from '../hooks/useLanguage';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -26,6 +27,7 @@ const itemVariants = {
 };
 
 export const Gallery = () => {
+  const { t, language } = useLanguage();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export const Gallery = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-gray-500 font-light">Loading gallery...</p>
+        <p className="text-gray-500 font-light">{t('gallery.loading')}</p>
       </div>
     );
   }
@@ -58,7 +60,7 @@ export const Gallery = () => {
   if (paintings.length === 0) {
     return (
       <div className="flex items-center justify-center py-24">
-        <p className="text-gray-400 font-light text-lg">No uploads yet</p>
+        <p className="text-gray-400 font-light text-lg">{t('gallery.noUploads')}</p>
       </div>
     );
   }
@@ -103,10 +105,10 @@ export const Gallery = () => {
           </div>
 
           <motion.div className="p-4">
-            <h3 className="font-light text-lg mb-1">{painting.title.en}</h3>
+            <h3 className="font-light text-lg mb-1">{painting.title[language as 'en' | 'he']}</h3>
             <p className="text-gray-500 text-sm mb-3">{painting.year}</p>
             <p className="text-gray-600 text-sm line-clamp-2">
-              {painting.description.en}
+              {painting.description[language as 'en' | 'he']}
             </p>
           </motion.div>
         </motion.div>
@@ -135,9 +137,9 @@ export const Gallery = () => {
               />
             </div>
             <div className="p-6 border-t border-gray-200">
-              <h2 className="text-2xl font-light mb-2">{selectedPainting.title.en}</h2>
+              <h2 className="text-2xl font-light mb-2">{selectedPainting.title[language as 'en' | 'he']}</h2>
               <p className="text-gray-500 text-sm mb-3">{selectedPainting.year}</p>
-              <p className="text-gray-600 mb-4">{selectedPainting.description.en}</p>
+              <p className="text-gray-600 mb-4">{selectedPainting.description[language as 'en' | 'he']}</p>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-500">{selectedPainting.dimensions}</p>
                 <motion.button
@@ -146,7 +148,7 @@ export const Gallery = () => {
                   onClick={() => setSelectedPainting(null)}
                   className="px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
                 >
-                  Close
+                  {t('gallery.close')}
                 </motion.button>
               </div>
             </div>

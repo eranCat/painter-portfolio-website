@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useLanguage } from '../hooks/useLanguage';
 
 export const Hero = () => {
+  const { t } = useLanguage();
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -23,7 +25,7 @@ export const Hero = () => {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-6xl md:text-8xl font-light tracking-wider mb-6"
         >
-          CONTEMPORARY ART
+          {t('hero.title')}
         </motion.h1>
 
         <motion.p
@@ -32,7 +34,7 @@ export const Hero = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-xl md:text-2xl font-light tracking-wide text-gray-300 mb-8 max-w-2xl mx-auto"
         >
-          Exploring the intersection of emotion and abstraction
+          {t('hero.subtitle')}
         </motion.p>
 
         <motion.a
@@ -44,7 +46,7 @@ export const Hero = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Explore Gallery
+          {t('hero.cta')}
         </motion.a>
       </div>
 

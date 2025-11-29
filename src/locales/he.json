@@ -1,11 +1,32 @@
 {
   "nav": {
+    "brand": "אמן",
     "gallery": "גלריה",
     "about": "אודות",
-    "contact": "צור קשר"
+    "contact": "צור קשר",
+    "admin": "ממשק ניהול"
+  },
+  "hero": {
+    "title": "אמנות בת זמננו",
+    "subtitle": "חקר צומת הרגש וההפשטה",
+    "cta": "עיין בגלריה"
   },
   "about": {
     "description": "ברוכים הבאים לתיקיית העבודות של האמנות הקונטמפוררית שלי. אני יוצר ציורים תוססים וגרירים שחוקרים את הצומת בין רגש להפשטה. כל יצירה היא ביטוי ייחודי לראיית עולמי האמנותית, שנוצרה בתשוקה ובדיוק. עיין בגלריה שלי כדי לגלות יצירות שמעוררות תהייה ובוחנות תפיסה."
+  },
+  "features": {
+    "contemporary": "בן זמננו",
+    "contemporaryDesc": "חזון אמנותי מודרני וטכניקות",
+    "authentic": "אותנטי",
+    "authenticDesc": "כל יצירה מספרת סיפור ייחודי",
+    "accessible": "נגיש",
+    "accessibleDesc": "אמנות לאספנים ותיאבי אמנות"
+  },
+  "footer": {
+    "copyright": "© {{year}} אמנות בן זמננו. כל הזכויות שמורות.",
+    "instagram": "אינסטגרם",
+    "facebook": "פייסבוק",
+    "contact": "צור קשר"
   },
   "contact": {
     "title": "צור קשר",
@@ -18,6 +39,11 @@
     "success": "ההודעה נשלחה בהצלחה!",
     "error": "שגיאה בשליחת ההודעה"
   },
+  "gallery": {
+    "loading": "טוען גלריה...",
+    "noUploads": "עדיין לא הועלו עבודות",
+    "close": "סגור"
+  },
   "admin": {
     "title": "לוח בקרה",
     "login": "כניסה",
@@ -26,6 +52,51 @@
     "paintings": "ציורים",
     "contacts": "יצירת קשר",
     "delete": "מחק",
-    "edit": "ערוך"
+    "edit": "ערוך",
+    "loginTitle": "כניסה למנהל",
+    "credentials": "השתמש בפרטי ההתחברות של Firebase שלך",
+    "loggingIn": "מתחבר...",
+    "dashboard": "לוח בקרה",
+    "backToHome": "חזור לעמוד הבית",
+    "loading": "טוען...",
+    "noPaintingsYet": "עדיין אין ציורים. צור את הראשון שלך!",
+    "noContactsYet": "אין הודעות יצירת קשר עדיין. כשמבקרים יצרו קשר, הם יופיעו כאן!",
+    "tableHeaders": {
+      "title": "כותרת",
+      "year": "שנה",
+      "actions": "פעולות",
+      "name": "שם",
+      "email": "דוא״ל",
+      "message": "הודעה",
+      "date": "תאריך"
+    },
+    "buttons": {
+      "reply": "הגב",
+      "delete": "מחק",
+      "saving": "שומר...",
+      "update": "עדכן ציור",
+      "add": "הוסף ציור",
+      "cancel": "בטל"
+    },
+    "formLabels": {
+      "titleEn": "כותרת (אנגלית)",
+      "titleHe": "כותרת (עברית)",
+      "descriptionEn": "תיאור (אנגלית)",
+      "descriptionHe": "תיאור (עברית)",
+      "imageUrl": "כתובת URL של התמונה",
+      "pasteUrl": "הדבק כתובת URL של תמונה",
+      "helpText": "הדבק כתובת URL ישירה של תמונה (לדוגמה, https://example.com/image.jpg)",
+      "category": "קטגוריה",
+      "categories": {
+        "abstract": "אבסטרקטי",
+        "portrait": "דיוקן",
+        "landscape": "נוף",
+        "stillLife": "חיים דוממים"
+      },
+      "dimensions": "מימדים",
+      "width": "רוחב",
+      "height": "גובה",
+      "unit": "יחידה"
+    }
   }
 }

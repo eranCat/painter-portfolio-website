@@ -22,7 +22,7 @@ export const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-light tracking-wider">
-            ARTIST
+            David Paz Gideon
           </Link>
 
           {/* Desktop Menu */}
@@ -46,7 +46,7 @@ export const Navigation = () => {
               to="/admin"
               className="text-sm px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
             >
-              Admin
+              {t('nav.admin')}
             </Link>
           </div>
 
@@ -101,7 +101,7 @@ export const Navigation = () => {
                 className="block px-3 py-2 text-sm hover:bg-gray-100 rounded"
                 onClick={() => setIsOpen(false)}
               >
-                Admin
+                {t('nav.admin')}
               </Link>
             </div>
           </motion.div>
