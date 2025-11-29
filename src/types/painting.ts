@@ -21,12 +21,6 @@ export interface PaintingFormData {
   titleHe: string;
   descriptionEn: string;
   descriptionHe: string;
-  category: string;
   year: number;
   dimensions: string;
-  image: File | null;
-  // Form-specific fields for dimension input
-  dimensionWidth?: number | string;
-  dimensionHeight?: number | string;
-  dimensionUnit?: string;
 }

@@ -15,13 +15,8 @@ interface FormData {
   descriptionEn: string;
   descriptionHe: string;
   imageUrl: string;
-  image: File | null;
-  category: string;
   year: number;
   dimensions: string;
-  dimensionWidth: string;
-  dimensionHeight: string;
-  dimensionUnit: string;
 }
 
 interface AboutFormData {
@@ -64,13 +59,8 @@ export const AdminPanel = () => {
     descriptionEn: '',
     descriptionHe: '',
     imageUrl: '',
-    image: null,
-    category: 'abstract',
     year: new Date().getFullYear(),
     dimensions: '',
-    dimensionWidth: '',
-    dimensionHeight: '',
-    dimensionUnit: 'cm',
   });
   const [aboutFormData, setAboutFormData] = useState<AboutFormData>({
     descriptionEn: '',
@@ -177,48 +167,22 @@ export const AdminPanel = () => {
       descriptionEn: '',
       descriptionHe: '',
       imageUrl: '',
-      image: null,
-      category: 'abstract',
       year: new Date().getFullYear(),
       dimensions: '',
-      dimensionWidth: '',
-      dimensionHeight: '',
-      dimensionUnit: 'cm',
     });
     setShowForm(true);
   };
 
   const handleEditClick = (painting: Painting) => {
     setEditingId(painting.id);
-    // Parse existing dimensions string (e.g., "100x200cm" -> width: 100, height: 200, unit: cm)
-    let dimensionWidth = '';
-    let dimensionHeight = '';
-    let dimensionUnit = 'cm';
-
-    if (painting.dimensions) {
-      const dimensionMatch = painting.dimensions.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)(?:\s*([a-z%]+))?$/i);
-      if (dimensionMatch) {
-        dimensionWidth = dimensionMatch[1];
-        dimensionHeight = dimensionMatch[2];
-        if (dimensionMatch[3]) {
-          dimensionUnit = dimensionMatch[3];
-        }
-      }
-    }
-
     setFormData({
       titleEn: painting.title.en,
       titleHe: painting.title.he,
       descriptionEn: painting.description.en,
       descriptionHe: painting.description.he,
       imageUrl: painting.imageUrl,
-      image: null,
-      category: painting.category,
       year: painting.year,
       dimensions: painting.dimensions,
-      dimensionWidth,
-      dimensionHeight,
-      dimensionUnit,
     });
     setShowForm(true);
   };
@@ -235,23 +199,13 @@ export const AdminPanel = () => {
         return;
       }
 
-      // Build dimensions string from separate fields
-      let dimensions = '';
-      if (formData.dimensionWidth || formData.dimensionHeight) {
-        const width = formData.dimensionWidth || 0;
-        const height = formData.dimensionHeight || 0;
-        const unit = formData.dimensionUnit || 'cm';
-        dimensions = `${width}x${height}${unit}`;
-      }
-
       if (editingId) {
         await updatePainting(editingId, {
           title: { en: formData.titleEn, he: formData.titleHe },
           description: { en: formData.descriptionEn, he: formData.descriptionHe },
           imageUrl,
-          category: formData.category,
           year: formData.year,
-          dimensions,
+          dimensions: formData.dimensions,
         });
         const updatedPaintings = paintings.map((p) =>
           p.id === editingId
@@ -260,9 +214,8 @@ export const AdminPanel = () => {
                 title: { en: formData.titleEn, he: formData.titleHe },
                 description: { en: formData.descriptionEn, he: formData.descriptionHe },
                 imageUrl,
-                category: formData.category,
                 year: formData.year,
-                dimensions,
+                dimensions: formData.dimensions,
               }
             : p
         );
@@ -274,10 +227,8 @@ export const AdminPanel = () => {
             titleHe: formData.titleHe,
             descriptionEn: formData.descriptionEn,
             descriptionHe: formData.descriptionHe,
-            category: formData.category,
             year: formData.year,
-            dimensions,
-            image: null,
+            dimensions: formData.dimensions,
           },
           imageUrl
         );
@@ -849,122 +800,65 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">{t('admin.formLabels.imageUrl')}</label>
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUploadToGithub}
-                      className="hidden"
-                    />
-                    <input
-                      type="text"
-                      placeholder={t('admin.formLabels.pasteUrl')}
-                      value={formData.imageUrl}
-                      onChange={(e) =>
-                        setFormData({ ...formData, imageUrl: e.target.value })
-                      }
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                    {hasGithubConfig && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={formLoading}
-                        className="px-3 py-2 border border-blue-300 text-blue-600 rounded hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap font-light text-sm"
-                      >
-                        📤 Upload
-                      </motion.button>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {t('admin.formLabels.helpText')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-light mb-2">{t('admin.formLabels.category')}</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
+                <label className="block text-sm font-light mb-2">Image Upload</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUploadToGithub}
+                  className="hidden"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.parentElement?.classList.add('border-blue-500', 'bg-blue-50');
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.parentElement?.classList.remove('border-blue-500', 'bg-blue-50');
+                  }}
+                />
+                <motion.div
+                  whileHover={{ borderColor: '#3b82f6' }}
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                      const event = {
+                        target: { files: e.dataTransfer.files },
+                      } as unknown as React.ChangeEvent<HTMLInputElement>;
+                      handleFileUploadToGithub(event);
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  >
-                    <option value="abstract">{t('admin.formLabels.categories.abstract')}</option>
-                    <option value="portrait">{t('admin.formLabels.categories.portrait')}</option>
-                    <option value="landscape">{t('admin.formLabels.categories.landscape')}</option>
-                    <option value="still-life">{t('admin.formLabels.categories.stillLife')}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-light mb-2">{t('admin.tableHeaders.year')}</label>
-                  <input
-                    type="number"
-                    value={formData.year}
-                    onChange={(e) =>
-                      setFormData({ ...formData, year: parseInt(e.target.value) })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                </div>
+                  }}
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-blue-500 hover:bg-blue-50"
+                >
+                  {formData.imageUrl ? (
+                    <div>
+                      <p className="text-sm font-light text-green-600 mb-2">✓ Image uploaded</p>
+                      <p className="text-xs text-gray-500">{formData.imageUrl.split('/').pop()}</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-lg mb-2">📸</p>
+                      <p className="text-sm font-light mb-1">Drag and drop your image here</p>
+                      <p className="text-xs text-gray-500">or click to browse</p>
+                    </div>
+                  )}
+                </motion.div>
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">{t('admin.formLabels.dimensions')}</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.width')}</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.dimensionWidth || ''}
-                      onChange={(e) =>
-                        setFormData({ ...formData, dimensionWidth: e.target.value })
-                      }
-                      placeholder="e.g., 100"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.height')}</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={formData.dimensionHeight || ''}
-                      onChange={(e) =>
-                        setFormData({ ...formData, dimensionHeight: e.target.value })
-                      }
-                      placeholder="e.g., 100"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-light mb-1 text-gray-600">{t('admin.formLabels.unit')}</label>
-                    <select
-                      value={formData.dimensionUnit || 'cm'}
-                      onChange={(e) =>
-                        setFormData({ ...formData, dimensionUnit: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                    >
-                      <option value="cm">cm</option>
-                      <option value="in">in</option>
-                      <option value="mm">mm</option>
-                      <option value="m">m</option>
-                      <option value="px">px</option>
-                    </select>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  Format: {formData.dimensionWidth || '?'} × {formData.dimensionHeight || '?'} {formData.dimensionUnit || 'cm'}
-                </p>
+                <label className="block text-sm font-light mb-2">{t('admin.tableHeaders.year')}</label>
+                <input
+                  type="number"
+                  value={formData.year}
+                  onChange={(e) =>
+                    setFormData({ ...formData, year: parseInt(e.target.value) })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
               </div>
 
               <div className="flex gap-4 pt-4">

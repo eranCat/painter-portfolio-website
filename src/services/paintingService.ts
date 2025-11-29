@@ -29,7 +29,7 @@ export const addPainting = async (paintingData: PaintingFormData, imageUrl: stri
         he: paintingData.descriptionHe,
       },
       imageUrl,
-      category: paintingData.category,
+      category: 'uncategorized',
       year: paintingData.year,
       dimensions: paintingData.dimensions,
       createdAt: Timestamp.now(),
