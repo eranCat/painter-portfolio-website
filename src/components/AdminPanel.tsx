@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting, addPainting, updatePainting, uploadPaintingImage } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting, fileToBase64 } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
@@ -83,7 +83,7 @@ export const AdminPanel = () => {
       year: new Date().getFullYear(),
       price: 0,
       dimensions: '',
-    });
+    } as any);
     setShowForm(true);
   };
 
@@ -100,7 +100,7 @@ export const AdminPanel = () => {
       year: painting.year,
       price: painting.price,
       dimensions: painting.dimensions,
-    });
+    } as any);
     setShowForm(true);
   };
 
@@ -111,9 +111,9 @@ export const AdminPanel = () => {
     try {
       let imageUrl = formData.imageUrl;
 
-      // Upload image if a new one was selected
+      // Convert image to Base64 if a new one was selected
       if (formData.image) {
-        imageUrl = await uploadPaintingImage(formData.image);
+        imageUrl = await fileToBase64(formData.image);
       }
 
       if (!imageUrl) {
@@ -157,7 +157,7 @@ export const AdminPanel = () => {
             year: formData.year,
             price: formData.price,
             dimensions: formData.dimensions,
-            image: formData.image,
+            image: null,
           },
           imageUrl
         );

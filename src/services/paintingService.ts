@@ -11,27 +11,22 @@ import {
   orderBy,
   Timestamp,
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from './firebaseConfig';
+import { db } from './firebaseConfig';
 import { Painting, PaintingFormData } from '../types/painting';
 
 const PAINTINGS_COLLECTION = 'paintings';
 
-// Upload image to Firebase Storage
-export const uploadPaintingImage = async (file: File): Promise<string> => {
-  try {
-    const timestamp = Date.now();
-    const filename = `${timestamp}-${file.name}`;
-    const storageRef = ref(storage, `paintings/${filename}`);
-
-    await uploadBytes(storageRef, file);
-    const downloadUrl = await getDownloadURL(storageRef);
-
-    return downloadUrl;
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    throw error;
-  }
+// Convert image file to Base64 string
+export const fileToBase64 = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => {
+      console.error('Error converting file to Base64:', error);
+      reject(error);
+    };
+  });
 };
 
 // Add a new painting
