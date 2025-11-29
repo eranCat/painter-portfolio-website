@@ -14,7 +14,7 @@ export const ThemeSelector = () => {
         onClick={toggleTheme}
         className="rounded-full shadow-lg p-3 transition-colors"
         style={{
-          backgroundColor: mode === 'light' ? '#ffffff' : '#2d2d2d',
+          backgroundColor: mode === 'light' ? '#2d2d2d' : '#ffffff',
         }}
         aria-label="Toggle theme"
       >
