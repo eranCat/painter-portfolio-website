@@ -1,0 +1,6 @@
+{
+  "watch": [".env.local", "src/**/*"],
+  "ext": "js,jsx,ts,tsx,json,env,local",
+  "ignore": ["node_modules/**", "build/**"],
+  "exec": "react-scripts start"
+}

@@ -48,6 +48,17 @@ export const AdminPanel = () => {
   const [formLoading, setFormLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Convert GitHub path to full raw URL (same logic as carousel)
+  const getImageUrl = (url: string): string => {
+    if (url.includes('firebasestorage.googleapis.com')) {
+      return url;
+    }
+    if (url.includes('raw.githubusercontent.com')) {
+      return url;
+    }
+    return `https://raw.githubusercontent.com/${url}`;
+  };
+
   // Load GitHub credentials from environment variables
   const githubToken = process.env.REACT_APP_GITHUB_TOKEN || '';
   const githubOwner = process.env.REACT_APP_GITHUB_OWNER || '';
@@ -328,6 +339,51 @@ export const AdminPanel = () => {
     }
   };
 
+  const handleQuickAddDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleQuickAddDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      if (!hasGithubConfig) {
+        alert('GitHub credentials not configured in environment variables');
+        return;
+      }
+
+      setFormLoading(true);
+      try {
+        const result = await uploadImageToGithub(file, githubToken, githubOwner, githubRepo);
+
+        if (result.success && result.path) {
+          // Open the form with the uploaded image
+          setEditingId(null);
+          setFormData({
+            titleEn: '',
+            titleHe: '',
+            descriptionEn: '',
+            descriptionHe: '',
+            imageUrl: result.path,
+            year: new Date().getFullYear(),
+            dimensions: '',
+          });
+          setShowForm(true);
+        } else {
+          alert(`Upload failed: ${result.error}`);
+        }
+      } catch (error) {
+        console.error('Error uploading to GitHub:', error);
+        alert('Error uploading image to GitHub');
+      } finally {
+        setFormLoading(false);
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -375,14 +431,31 @@ export const AdminPanel = () => {
           animate={{ opacity: 1 }}
           className="space-y-4"
         >
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleAddClick}
-            className="mb-6 px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
-          >
-            + {t('admin.addPainting')}
-          </motion.button>
+          <div className="mb-6 flex gap-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleAddClick}
+              className="px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
+            >
+              + {t('admin.addPainting')}
+            </motion.button>
+
+            <motion.div
+              whileHover={{ scale: 1.02, borderColor: '#3b82f6' }}
+              onDragOver={handleQuickAddDragOver}
+              onDrop={handleQuickAddDrop}
+              className="flex-1 border-2 border-dashed border-gray-300 rounded-lg px-6 py-2 text-center cursor-pointer transition-colors hover:border-blue-500 hover:bg-blue-50"
+            >
+              {formLoading ? (
+                <p className="text-sm text-gray-600">Uploading...</p>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  📸 Drag & drop image here to add painting
+                </p>
+              )}
+            </motion.div>
+          </div>
 
           {loading ? (
             <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
@@ -398,6 +471,7 @@ export const AdminPanel = () => {
                     <th className="px-4 py-3 font-light">Image</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.title')}</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.year')}</th>
+                    <th className="px-4 py-3 font-light">Dimensions</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.actions')}</th>
                   </tr>
                 </thead>
@@ -409,16 +483,26 @@ export const AdminPanel = () => {
                     >
                       <td className="px-4 py-3">
                         <img
-                          src={painting.imageUrl}
+                          src={getImageUrl(painting.imageUrl)}
                           alt={painting.title.en}
                           className="h-12 w-12 object-cover rounded"
                           onError={(e) => {
                             e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48"%3E%3Crect fill="%23f0f0f0" width="48" height="48"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="12"%3ENo Image%3C/text%3E%3C/svg%3E';
                           }}
+                          onLoad={(e) => {
+                            const img = e.currentTarget as HTMLImageElement;
+                            const dimSpan = img.parentElement?.nextElementSibling?.nextElementSibling?.nextElementSibling?.querySelector('.dimensions');
+                            if (dimSpan && img.naturalWidth && img.naturalHeight) {
+                              dimSpan.textContent = `${img.naturalWidth} × ${img.naturalHeight} px`;
+                            }
+                          }}
                         />
                       </td>
                       <td className="px-4 py-3">{painting.title.en}</td>
                       <td className="px-4 py-3">{painting.year}</td>
+                      <td className="px-4 py-3">
+                        <span className="dimensions text-xs text-gray-400">Loading...</span>
+                      </td>
                       <td className="px-4 py-3 space-x-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}

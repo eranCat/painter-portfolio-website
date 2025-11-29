@@ -10,6 +10,7 @@ export const PaintingCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
 
   // Load paintings from Firebase
   useEffect(() => {
@@ -33,6 +34,7 @@ export const PaintingCarousel = () => {
 
     const currentPainting = paintings[currentIndex];
     setImageUrl(''); // Reset before loading new image
+    setImageDimensions(null); // Reset dimensions
 
     // Use GitHub raw content for images (perfect CORS support)
     const getImageUrl = (url: string): string => {
@@ -53,6 +55,9 @@ export const PaintingCarousel = () => {
     img.crossOrigin = 'anonymous';
 
     img.onload = () => {
+      // Store original image dimensions
+      setImageDimensions({ width: img.width, height: img.height });
+
       try {
         const canvas = document.createElement('canvas');
         canvas.width = 1024;
@@ -145,14 +150,14 @@ export const PaintingCarousel = () => {
         <div className="flex flex-col lg:flex-row gap-8 items-center">
           {/* Image section */}
           <div className="w-full lg:w-2/3">
-            <div className="relative bg-gray-50 rounded-lg overflow-hidden shadow-lg aspect-square md:aspect-auto md:h-96 lg:h-[500px]">
+            <div className="relative bg-gray-900 rounded-lg overflow-hidden shadow-lg aspect-[4/3] md:aspect-auto md:h-96 lg:h-[600px]">
               <AnimatePresence mode="wait">
                 {imageUrl ? (
                   <motion.img
                     key={currentIndex}
                     src={imageUrl}
                     alt={paintingTitle}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -251,24 +256,13 @@ export const PaintingCarousel = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">
-                    {t('painting.category')}
-                  </p>
-                  <p className="font-medium text-gray-800">
-                    {currentPainting.category}
+              {imageDimensions && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-400">
+                    {imageDimensions.width} × {imageDimensions.height} px
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">
-                    {t('painting.dimensions')}
-                  </p>
-                  <p className="font-medium text-gray-800">
-                    {currentPainting.dimensions}
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </motion.div>
         </div>
