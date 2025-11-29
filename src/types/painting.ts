@@ -11,10 +11,8 @@ export interface Painting {
   imageUrl: string;
   category: string;
   year: number;
-  price: number;
   dimensions: string;
   createdAt: Date;
-  featured: boolean;
   tags?: string[];
 }
 
@@ -25,7 +23,6 @@ export interface PaintingFormData {
   descriptionHe: string;
   category: string;
   year: number;
-  price: number;
   dimensions: string;
   image: File | null;
   // Form-specific fields for dimension input

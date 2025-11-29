@@ -94,7 +94,6 @@ export const Gallery = () => {
                 className="absolute inset-0 bg-black/70 flex items-center justify-center"
               >
                 <div className="text-white text-center px-4">
-                  <p className="text-sm mb-2">${painting.price}</p>
                   <p className="text-xs text-gray-300">{painting.dimensions}</p>
                 </div>
               </motion.div>

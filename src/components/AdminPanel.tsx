@@ -24,7 +24,6 @@ export const AdminPanel = () => {
     image: null as File | null,
     category: 'abstract',
     year: new Date().getFullYear(),
-    price: 0,
     dimensions: '',
     dimensionWidth: '',
     dimensionHeight: '',
@@ -88,7 +87,6 @@ export const AdminPanel = () => {
       image: null,
       category: 'abstract',
       year: new Date().getFullYear(),
-      price: 0,
       dimensions: '',
       dimensionWidth: '',
       dimensionHeight: '',
@@ -124,7 +122,6 @@ export const AdminPanel = () => {
       image: null,
       category: painting.category,
       year: painting.year,
-      price: painting.price,
       dimensions: painting.dimensions,
       dimensionWidth,
       dimensionHeight,
@@ -161,7 +158,6 @@ export const AdminPanel = () => {
           imageUrl,
           category: formData.category,
           year: formData.year,
-          price: formData.price,
           dimensions,
         });
         const updatedPaintings = paintings.map((p) =>
@@ -173,7 +169,6 @@ export const AdminPanel = () => {
                 imageUrl,
                 category: formData.category,
                 year: formData.year,
-                price: formData.price,
                 dimensions,
               }
             : p
@@ -188,7 +183,6 @@ export const AdminPanel = () => {
             descriptionHe: formData.descriptionHe,
             category: formData.category,
             year: formData.year,
-            price: formData.price,
             dimensions,
             image: null,
           },
@@ -264,7 +258,6 @@ export const AdminPanel = () => {
                   <tr>
                     <th className="px-4 py-3 font-light">Title</th>
                     <th className="px-4 py-3 font-light">Year</th>
-                    <th className="px-4 py-3 font-light">Price</th>
                     <th className="px-4 py-3 font-light">Actions</th>
                   </tr>
                 </thead>
@@ -276,7 +269,6 @@ export const AdminPanel = () => {
                     >
                       <td className="px-4 py-3">{painting.title.en}</td>
                       <td className="px-4 py-3">{painting.year}</td>
-                      <td className="px-4 py-3">${painting.price}</td>
                       <td className="px-4 py-3 space-x-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -463,7 +455,7 @@ export const AdminPanel = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-light mb-2">Category</label>
                   <select
@@ -486,17 +478,6 @@ export const AdminPanel = () => {
                     value={formData.year}
                     onChange={(e) =>
                       setFormData({ ...formData, year: parseInt(e.target.value) })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-light mb-2">Price</label>
-                  <input
-                    type="number"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: parseFloat(e.target.value) })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   />

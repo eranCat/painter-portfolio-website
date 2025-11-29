@@ -118,13 +118,22 @@ export const AdminPage = () => {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-light">Admin Dashboard</h1>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={handleLogout}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-light transition-colors"
-          >
-            Logout
-          </motion.button>
+          <div className="flex gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate('/')}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 font-light transition-colors"
+            >
+              Back to Home
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={handleLogout}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-light transition-colors"
+            >
+              Logout
+            </motion.button>
+          </div>
         </div>
 
         <AdminPanel />

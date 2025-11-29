@@ -50,10 +50,8 @@ export const addPainting = async (paintingData: PaintingFormData, imageUrl: stri
       imageUrl,
       category: paintingData.category,
       year: paintingData.year,
-      price: paintingData.price,
       dimensions: paintingData.dimensions,
       createdAt: Timestamp.now(),
-      featured: false,
       tags: [],
     });
     return docRef.id;
@@ -141,10 +139,9 @@ export const updatePainting = async (
 ) => {
   try {
     const docRef = doc(db, PAINTINGS_COLLECTION, id);
-    await updateDoc(docRef, {
-      ...paintingData,
-      createdAt: paintingData.createdAt ? Timestamp.fromDate(paintingData.createdAt) : undefined,
-    });
+    const updateData = { ...paintingData };
+    delete updateData.createdAt;
+    await updateDoc(docRef, updateData);
     return id;
   } catch (error) {
     console.error('Error updating painting:', error);
@@ -163,14 +160,3 @@ export const deletePainting = async (id: string) => {
   }
 };
 
-// Toggle featured status
-export const toggleFeatured = async (id: string, featured: boolean) => {
-  try {
-    const docRef = doc(db, PAINTINGS_COLLECTION, id);
-    await updateDoc(docRef, { featured: !featured });
-    return id;
-  } catch (error) {
-    console.error('Error toggling featured:', error);
-    throw error;
-  }
-};
