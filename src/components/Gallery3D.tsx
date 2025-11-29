@@ -58,7 +58,7 @@ export const Gallery3D = () => {
       0.1,
       1000
     );
-    camera.position.set(0, 1.6, 0);
+    camera.position.set(0, 1.5, 0);
     cameraRef.current = camera;
 
     // Renderer setup
@@ -103,14 +103,14 @@ export const Gallery3D = () => {
     const ceilingGeometry = new THREE.PlaneGeometry(20, 20);
     const ceilingMaterial = new THREE.MeshLambertMaterial({ color: 0xfafafa });
     const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
-    ceiling.position.y = 4;
+    ceiling.position.y = 5.5;
     ceiling.rotation.x = Math.PI / 2;
     ceiling.receiveShadow = true;
     scene.add(ceiling);
 
     // Create 4 walls with paintings
     const wallDistance = 9;
-    const wallHeight = 4.5; // Increased wall height
+    const wallHeight = 5.5; // Increased wall height for more spacious gallery
     const wallWidth = 20;
     const wallPositions = [
       { x: 0, z: wallDistance, rotY: 0, name: 'back' },
@@ -165,7 +165,7 @@ export const Gallery3D = () => {
       const gridWidth = (itemsPerRow - 1) * horizontalSpacing;
       const gridHeight = (rowCount - 1) * verticalSpacing;
       const startX = -gridWidth / 2;
-      const startY = 2.5 - (gridHeight / 2); // Center vertically on wall
+      const startY = 2.75 - (gridHeight / 2); // Center vertically on wall (wallHeight / 2 = 2.75)
 
       wallPaintings.forEach((painting, index) => {
         const col = index % itemsPerRow;
