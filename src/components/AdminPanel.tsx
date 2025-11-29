@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
@@ -12,6 +12,21 @@ export const AdminPanel = () => {
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    titleEn: '',
+    titleHe: '',
+    descriptionEn: '',
+    descriptionHe: '',
+    imageUrl: '',
+    image: null as File | null,
+    category: 'abstract',
+    year: new Date().getFullYear(),
+    price: 0,
+    dimensions: '',
+  });
 
   useEffect(() => {
     loadData();
@@ -55,6 +70,96 @@ export const AdminPanel = () => {
     }
   };
 
+  const handleAddClick = () => {
+    setEditingId(null);
+    setFormData({
+      titleEn: '',
+      titleHe: '',
+      descriptionEn: '',
+      descriptionHe: '',
+      imageUrl: '',
+      image: null,
+      category: 'abstract',
+      year: new Date().getFullYear(),
+      price: 0,
+      dimensions: '',
+    });
+    setShowForm(true);
+  };
+
+  const handleEditClick = (painting: Painting) => {
+    setEditingId(painting.id);
+    setFormData({
+      titleEn: painting.title.en,
+      titleHe: painting.title.he,
+      descriptionEn: painting.description.en,
+      descriptionHe: painting.description.he,
+      imageUrl: painting.imageUrl,
+      image: null,
+      category: painting.category,
+      year: painting.year,
+      price: painting.price,
+      dimensions: painting.dimensions,
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      if (editingId) {
+        await updatePainting(editingId, {
+          title: { en: formData.titleEn, he: formData.titleHe },
+          description: { en: formData.descriptionEn, he: formData.descriptionHe },
+          imageUrl: formData.imageUrl,
+          category: formData.category,
+          year: formData.year,
+          price: formData.price,
+          dimensions: formData.dimensions,
+        });
+        const updatedPaintings = paintings.map((p) =>
+          p.id === editingId
+            ? {
+                ...p,
+                title: { en: formData.titleEn, he: formData.titleHe },
+                description: { en: formData.descriptionEn, he: formData.descriptionHe },
+                imageUrl: formData.imageUrl,
+                category: formData.category,
+                year: formData.year,
+                price: formData.price,
+                dimensions: formData.dimensions,
+              }
+            : p
+        );
+        setPaintings(updatedPaintings);
+      } else {
+        await addPainting(
+          {
+            titleEn: formData.titleEn,
+            titleHe: formData.titleHe,
+            descriptionEn: formData.descriptionEn,
+            descriptionHe: formData.descriptionHe,
+            category: formData.category,
+            year: formData.year,
+            price: formData.price,
+            dimensions: formData.dimensions,
+            image: formData.image,
+          },
+          formData.imageUrl
+        );
+        await loadData();
+      }
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error saving painting:', error);
+      alert('Error saving painting. Please try again.');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -95,6 +200,7 @@ export const AdminPanel = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            onClick={handleAddClick}
             className="mb-6 px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
           >
             + {t('admin.addPainting')}
@@ -130,6 +236,7 @@ export const AdminPanel = () => {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          onClick={() => handleEditClick(painting)}
                           className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100"
                         >
                           {t('admin.edit')}
@@ -218,6 +325,175 @@ export const AdminPanel = () => {
               </table>
             </div>
           )}
+        </motion.div>
+      )}
+
+      {/* Form Modal */}
+      {showForm && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowForm(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-screen overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-light mb-6">
+              {editingId ? 'Edit Painting' : 'Add New Painting'}
+            </h2>
+
+            <form onSubmit={handleSubmitForm} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-light mb-2">Title (English)</label>
+                  <input
+                    type="text"
+                    value={formData.titleEn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, titleEn: e.target.value })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-light mb-2">Title (Hebrew)</label>
+                  <input
+                    type="text"
+                    value={formData.titleHe}
+                    onChange={(e) =>
+                      setFormData({ ...formData, titleHe: e.target.value })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-light mb-2">
+                  Description (English)
+                </label>
+                <textarea
+                  value={formData.descriptionEn}
+                  onChange={(e) =>
+                    setFormData({ ...formData, descriptionEn: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-light mb-2">
+                  Description (Hebrew)
+                </label>
+                <textarea
+                  value={formData.descriptionHe}
+                  onChange={(e) =>
+                    setFormData({ ...formData, descriptionHe: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-light mb-2">Image URL</label>
+                <input
+                  type="url"
+                  value={formData.imageUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Enter a direct URL to the image. You can use Unsplash, Pexels, or your own image URL.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-light mb-2">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  >
+                    <option value="abstract">Abstract</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                    <option value="still-life">Still Life</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-light mb-2">Year</label>
+                  <input
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) =>
+                      setFormData({ ...formData, year: parseInt(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-light mb-2">Price</label>
+                  <input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) =>
+                      setFormData({ ...formData, price: parseFloat(e.target.value) })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-light mb-2">Dimensions</label>
+                <input
+                  type="text"
+                  value={formData.dimensions}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dimensions: e.target.value })
+                  }
+                  placeholder="e.g., 100x100cm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={formLoading}
+                  className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                >
+                  {formLoading ? 'Saving...' : editingId ? 'Update Painting' : 'Add Painting'}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="flex-1 border border-gray-300 py-2 rounded-lg font-light hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
         </motion.div>
       )}
     </motion.div>
