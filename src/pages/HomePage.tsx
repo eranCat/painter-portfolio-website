@@ -65,64 +65,6 @@ export const HomePage = () => {
                 ? (isRTL ? about.description.he : about.description.en)
                 : t('about.description')}
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-              {about ? (
-                [
-                  {
-                    title: isRTL ? about.features.contemporary.title.he : about.features.contemporary.title.en,
-                    description: isRTL ? about.features.contemporary.description.he : about.features.contemporary.description.en,
-                  },
-                  {
-                    title: isRTL ? about.features.authentic.title.he : about.features.authentic.title.en,
-                    description: isRTL ? about.features.authentic.description.he : about.features.authentic.description.en,
-                  },
-                  {
-                    title: isRTL ? about.features.accessible.title.he : about.features.accessible.title.en,
-                    description: isRTL ? about.features.accessible.description.he : about.features.accessible.description.en,
-                  },
-                ].map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="text-center"
-                  >
-                    <h3 className="text-xl font-light mb-2" style={{ color: theme.text }}>{item.title}</h3>
-                    <p style={{ color: theme.textSecondary }}>{item.description}</p>
-                  </motion.div>
-                ))
-              ) : (
-                [
-                  {
-                    titleKey: 'features.contemporary',
-                    descKey: 'features.contemporaryDesc',
-                  },
-                  {
-                    titleKey: 'features.authentic',
-                    descKey: 'features.authenticDesc',
-                  },
-                  {
-                    titleKey: 'features.accessible',
-                    descKey: 'features.accessibleDesc',
-                  },
-                ].map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="text-center"
-                  >
-                    <h3 className="text-xl font-light mb-2" style={{ color: theme.text }}>{t(item.titleKey)}</h3>
-                    <p style={{ color: theme.textSecondary }}>{t(item.descKey)}</p>
-                  </motion.div>
-                ))
-              )}
-            </div>
           </motion.div>
         </div>
       </section>
