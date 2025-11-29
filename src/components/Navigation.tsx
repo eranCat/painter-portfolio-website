@@ -22,11 +22,11 @@ export const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex justify-between items-center h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <Link to="/" className="text-2xl font-light tracking-wider">
-            David Paz Gideon
+            {t('about.artistName')}
           </Link>
 
           {/* Desktop Menu */}
-          <div className={`hidden md:flex items-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-8' : 'space-x-8'}`}>
+          <div className={`hidden md:flex items-center ${isRTL ? 'flex-row-reverse gap-8' : 'gap-8'}`}>
             {navItems.map((item) => (
               <a
                 key={item.label}

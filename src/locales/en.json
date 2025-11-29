@@ -12,7 +12,8 @@
     "cta": "Explore Gallery"
   },
   "about": {
-    "description": "Welcome to my contemporary art portfolio. I create vibrant, thought-provoking paintings that explore the intersection of emotion and abstraction. Each piece is a unique expression of my artistic vision, crafted with passion and precision. Browse my gallery to discover works that challenge perception and inspire contemplation."
+    "description": "Welcome to my contemporary art portfolio. I create vibrant, thought-provoking paintings that explore the intersection of emotion and abstraction. Each piece is a unique expression of my artistic vision, crafted with passion and precision. Browse my gallery to discover works that challenge perception and inspire contemplation.",
+    "artistName": "David Paz Gideon"
   },
   "features": {
     "contemporary": "Contemporary",
@@ -26,7 +27,8 @@
     "copyright": "© {{year}} Contemporary Art. All rights reserved.",
     "instagram": "Instagram",
     "facebook": "Facebook",
-    "contact": "Contact"
+    "contact": "Contact",
+    "copyrightArtist": "© {{year}} David Paz Gideon. All rights reserved."
   },
   "contact": {
     "title": "Get in Touch",

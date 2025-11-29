@@ -43,16 +43,16 @@ export const HomePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
               {[
                 {
-                  title: 'Contemporary',
-                  description: 'Modern artistic vision and techniques',
+                  titleKey: 'features.contemporary',
+                  descKey: 'features.contemporaryDesc',
                 },
                 {
-                  title: 'Authentic',
-                  description: 'Each piece tells a unique story',
+                  titleKey: 'features.authentic',
+                  descKey: 'features.authenticDesc',
                 },
                 {
-                  title: 'Accessible',
-                  description: 'Art for collectors and enthusiasts',
+                  titleKey: 'features.accessible',
+                  descKey: 'features.accessibleDesc',
                 },
               ].map((item, idx) => (
                 <motion.div
@@ -63,8 +63,8 @@ export const HomePage = () => {
                   transition={{ delay: idx * 0.1 }}
                   className="text-center"
                 >
-                  <h3 className="text-xl font-light mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                  <h3 className="text-xl font-light mb-2">{t(item.titleKey)}</h3>
+                  <p className="text-gray-600">{t(item.descKey)}</p>
                 </motion.div>
               ))}
             </div>
@@ -93,17 +93,17 @@ export const HomePage = () => {
             whileInView={{ opacity: 1 }}
             className="text-sm tracking-wide"
           >
-            © {new Date().getFullYear()} Contemporary Art. All rights reserved.
+            {t('footer.copyrightArtist').replace('{{year}}', new Date().getFullYear().toString())}
           </motion.p>
           <div className="flex justify-center gap-6">
             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-              Instagram
+              {t('footer.instagram')}
             </a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-              Facebook
+              {t('footer.facebook')}
             </a>
             <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
-              Contact
+              {t('footer.contact')}
             </a>
           </div>
         </div>
