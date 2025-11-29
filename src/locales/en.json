@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "gallery": "Gallery",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "about": {
+    "description": "Welcome to my contemporary art portfolio. I create vibrant, thought-provoking paintings that explore the intersection of emotion and abstraction. Each piece is a unique expression of my artistic vision, crafted with passion and precision. Browse my gallery to discover works that challenge perception and inspire contemplation."
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send Message",
+    "whatsapp": "WhatsApp",
+    "success": "Message sent successfully!",
+    "error": "Error sending message"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "login": "Login",
+    "logout": "Logout",
+    "addPainting": "Add New Painting",
+    "paintings": "Paintings",
+    "contacts": "Contacts",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}
