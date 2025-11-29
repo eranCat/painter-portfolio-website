@@ -4,9 +4,11 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebas
 import { auth } from '../services/firebaseConfig';
 import { AdminPanel } from '../components/AdminPanel';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../hooks/useLanguage';
 
 export const AdminPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [user, setUser] = useState(auth.currentUser);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +61,7 @@ export const AdminPage = () => {
           animate={{ y: 0, opacity: 1 }}
           className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full space-y-4"
         >
-          <h1 className="text-3xl font-light mb-6 text-center">Admin Login</h1>
+          <h1 className="text-3xl font-light mb-6 text-center">{t('admin.loginTitle')}</h1>
 
           {error && (
             <motion.div
@@ -72,7 +74,7 @@ export const AdminPage = () => {
           )}
 
           <div className="bg-blue-50 p-3 rounded text-sm text-blue-700 mb-4">
-            Use your Firebase credentials to login
+            {t('admin.credentials')}
           </div>
 
           <motion.input
@@ -102,7 +104,7 @@ export const AdminPage = () => {
             disabled={loading}
             className="w-full bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? t('admin.loggingIn') : t('admin.login')}
           </motion.button>
         </motion.form>
       </motion.div>
@@ -117,21 +119,21 @@ export const AdminPage = () => {
     >
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-light">Admin Dashboard</h1>
+          <h1 className="text-3xl font-light">{t('admin.dashboard')}</h1>
           <div className="flex gap-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={() => navigate('/')}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 font-light transition-colors"
             >
-              Back to Home
+              {t('admin.backToHome')}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
               className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-light transition-colors"
             >
-              Logout
+              {t('admin.logout')}
             </motion.button>
           </div>
         </div>
