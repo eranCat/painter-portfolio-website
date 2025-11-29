@@ -53,8 +53,10 @@ export const AdminPanel = () => {
       try {
         await deletePainting(id);
         setPaintings(paintings.filter((p) => p.id !== id));
+        alert('Painting deleted successfully!');
       } catch (error) {
         console.error('Error deleting painting:', error);
+        alert('Error deleting painting. Please try again.');
       }
     }
   };
@@ -64,8 +66,10 @@ export const AdminPanel = () => {
       try {
         await deleteContact(id);
         setContacts(contacts.filter((c) => c.id !== id));
+        alert('Contact deleted successfully!');
       } catch (error) {
         console.error('Error deleting contact:', error);
+        alert('Error deleting contact. Please try again.');
       }
     }
   };
