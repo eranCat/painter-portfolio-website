@@ -11,10 +11,28 @@ import {
   orderBy,
   Timestamp,
 } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebaseConfig';
 import { Painting, PaintingFormData } from '../types/painting';
 
 const PAINTINGS_COLLECTION = 'paintings';
+
+// Upload image to Firebase Storage
+export const uploadPaintingImage = async (file: File): Promise<string> => {
+  try {
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${file.name}`;
+    const storageRef = ref(storage, `paintings/${filename}`);
+
+    await uploadBytes(storageRef, file);
+    const downloadUrl = await getDownloadURL(storageRef);
+
+    return downloadUrl;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
 
 // Add a new painting
 export const addPainting = async (paintingData: PaintingFormData, imageUrl: string) => {

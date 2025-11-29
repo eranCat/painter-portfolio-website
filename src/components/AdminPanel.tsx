@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
+import { getPaintings, deletePainting, addPainting, updatePainting, uploadPaintingImage } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
@@ -109,11 +109,23 @@ export const AdminPanel = () => {
     setFormLoading(true);
 
     try {
+      let imageUrl = formData.imageUrl;
+
+      // Upload image if a new one was selected
+      if (formData.image) {
+        imageUrl = await uploadPaintingImage(formData.image);
+      }
+
+      if (!imageUrl) {
+        alert('Please select an image');
+        return;
+      }
+
       if (editingId) {
         await updatePainting(editingId, {
           title: { en: formData.titleEn, he: formData.titleHe },
           description: { en: formData.descriptionEn, he: formData.descriptionHe },
-          imageUrl: formData.imageUrl,
+          imageUrl,
           category: formData.category,
           year: formData.year,
           price: formData.price,
@@ -125,7 +137,7 @@ export const AdminPanel = () => {
                 ...p,
                 title: { en: formData.titleEn, he: formData.titleHe },
                 description: { en: formData.descriptionEn, he: formData.descriptionHe },
-                imageUrl: formData.imageUrl,
+                imageUrl,
                 category: formData.category,
                 year: formData.year,
                 price: formData.price,
@@ -147,7 +159,7 @@ export const AdminPanel = () => {
             dimensions: formData.dimensions,
             image: formData.image,
           },
-          formData.imageUrl
+          imageUrl
         );
         await loadData();
       }
@@ -403,19 +415,20 @@ export const AdminPanel = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-light mb-2">Image URL</label>
+                <label className="block text-sm font-light mb-2">Image</label>
                 <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, imageUrl: e.target.value })
-                  }
-                  required
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setFormData({ ...formData, image: file });
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  placeholder="https://example.com/image.jpg"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Enter a direct URL to the image. You can use Unsplash, Pexels, or your own image URL.
+                  Select a JPG, PNG, or GIF image file to upload. Max 5MB.
                 </p>
               </div>
 
