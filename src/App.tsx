@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useLanguage } from './hooks/useLanguage';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';import { useLanguage } from './hooks/useLanguage';
 import { Navigation } from './components/Navigation';
 import { HomePage } from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
