@@ -27,22 +27,26 @@ export const PaintingCarousel = () => {
     loadPaintings();
   }, []);
 
-  // Load image with CORS proxy for restricted images
+  // Load image from GitHub raw URL with perfect CORS support
   useEffect(() => {
     if (paintings.length === 0) return;
 
     const currentPainting = paintings[currentIndex];
     setImageUrl(''); // Reset before loading new image
 
-    // Use CORS proxy for ImgBB and other restricted images
-    const getCorsProxyUrl = (url: string): string => {
+    // Use GitHub raw content for images (perfect CORS support)
+    const getImageUrl = (url: string): string => {
       // If it's a Firebase Storage URL (no CORS issues), use as-is
       if (url.includes('firebasestorage.googleapis.com')) {
         return url;
       }
-      // For other URLs (ImgBB, etc.), use CORS proxy
-      // Using api.allorigins.win which is more reliable than cors-anywhere
-      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      // If it's already a GitHub raw URL, use as-is
+      if (url.includes('raw.githubusercontent.com')) {
+        return url;
+      }
+      // For other URLs, assume it's a GitHub file path like: owner/repo/path/to/image.jpg
+      // Convert to raw GitHub URL
+      return `https://raw.githubusercontent.com/${url}`;
     };
 
     const img = new Image();
@@ -85,15 +89,15 @@ export const PaintingCarousel = () => {
 
     img.onerror = () => {
       console.warn(
-        'Failed to load image with proxy, using direct URL:',
+        'Failed to load image from GitHub raw, using direct URL:',
         currentPainting.imageUrl
       );
       // Fallback to direct image URL
       setImageUrl(currentPainting.imageUrl);
     };
 
-    // Try with proxy first
-    img.src = getCorsProxyUrl(currentPainting.imageUrl);
+    // Load image from GitHub raw URL (perfect CORS support)
+    img.src = getImageUrl(currentPainting.imageUrl);
   }, [currentIndex, paintings]);
 
   const goToPrevious = () => {
