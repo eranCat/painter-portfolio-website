@@ -238,7 +238,7 @@ export const PaintingCarousel = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M10 6H6v4m12-4h4v4M6 18h4v-4m12 4h-4v-4"
+                      d="M4 8V4m0 0h4m-4 0l5 5m11-5v4m0-4h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
                     />
                   </svg>
                 </motion.button>
