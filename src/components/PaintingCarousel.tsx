@@ -203,15 +203,14 @@ export const PaintingCarousel = () => {
               </div>
             </div>
 
-            {/* Navigation buttons and thumbnails */}
-            <div className="mt-6 space-y-6">
-              {/* Previous/Next buttons */}
-              <div className="flex gap-4 justify-center lg:justify-start">
+            {/* Navigation buttons with thumbnails between */}
+            <div className="mt-6 flex items-center justify-center lg:justify-start gap-4">
+              {/* Previous button */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={goToPrevious}
-                className="p-3 rounded-full text-white transition-colors shadow-md"
+                className="p-3 rounded-full text-white transition-colors shadow-md flex-shrink-0"
                 style={{ backgroundColor: theme.primary }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.primaryHover}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
@@ -232,34 +231,8 @@ export const PaintingCarousel = () => {
                 </svg>
               </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={goToNext}
-                className="p-3 rounded-full text-white transition-colors shadow-md"
-                style={{ backgroundColor: theme.primary }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.primaryHover}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
-                aria-label={t('carousel.next')}
-              >
-                <svg
-                  className={`w-6 h-6 ${isRTL ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </motion.button>
-              </div>
-
               {/* Image thumbnails */}
-              <div className="flex justify-center lg:justify-start gap-3 flex-wrap">
+              <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
                 {paintings.map((painting, index) => (
                   <motion.button
                     key={index}
@@ -292,6 +265,32 @@ export const PaintingCarousel = () => {
                   </motion.button>
                 ))}
               </div>
+
+              {/* Next button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={goToNext}
+                className="p-3 rounded-full text-white transition-colors shadow-md flex-shrink-0"
+                style={{ backgroundColor: theme.primary }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
+                aria-label={t('carousel.next')}
+              >
+                <svg
+                  className={`w-6 h-6 ${isRTL ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </motion.button>
             </div>
           </div>
 
