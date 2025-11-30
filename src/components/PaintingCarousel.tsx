@@ -149,12 +149,12 @@ export const PaintingCarousel = () => {
   return (
     <div className={`py-12 md:py-20 ${isRTL ? 'rtl' : 'ltr'}`} style={{ backgroundColor: 'transparent' }}>
       <div className="max-w-6xl mx-auto px-4">
-        {/* Carousel container */}
-        <div className="flex flex-col lg:flex-row gap-8 items-center">
+        {/* Carousel container - Stack vertically on mobile, horizontal on lg */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:items-start">
           {/* Image section */}
-          <div className="w-full lg:w-2/3">
+          <div className="w-full lg:w-2/3 flex-shrink-0">
             <div
-              className="relative rounded-lg overflow-hidden shadow-lg aspect-[4/3] md:aspect-auto md:h-96 lg:h-[600px]"
+              className="relative rounded-lg overflow-hidden shadow-lg w-full h-96 md:h-[500px] lg:h-[550px]"
               style={{
                 backgroundColor: theme.mode === 'dark' ? '#1a1a1a' : '#f9f6f0',
                 backgroundImage: theme.mode === 'dark'
@@ -203,8 +203,10 @@ export const PaintingCarousel = () => {
               </div>
             </div>
 
-            {/* Navigation buttons */}
-            <div className="flex gap-4 mt-6 justify-center lg:justify-start">
+            {/* Navigation buttons and thumbnails */}
+            <div className="mt-6 space-y-6">
+              {/* Previous/Next buttons */}
+              <div className="flex gap-4 justify-center lg:justify-start">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -254,12 +256,48 @@ export const PaintingCarousel = () => {
                   />
                 </svg>
               </motion.button>
+              </div>
+
+              {/* Image thumbnails */}
+              <div className="flex justify-center lg:justify-start gap-3 flex-wrap">
+                {paintings.map((painting, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`relative rounded overflow-hidden transition-all ${
+                      index === currentIndex ? 'ring-2 shadow-lg' : 'opacity-60 hover:opacity-80'
+                    }`}
+                    style={{
+                      width: '70px',
+                      height: '52px'
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    aria-label={`${t('carousel.goToSlide')} ${index + 1}`}
+                  >
+                    <img
+                      src={getImageUrlFromPath(painting.imageUrl)}
+                      alt={painting.title.en}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="70" height="52"%3E%3Crect fill="%23e5e7eb" width="70" height="52"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="9"%3ENo Image%3C/text%3E%3C/svg%3E';
+                      }}
+                    />
+                    {index === currentIndex && (
+                      <div
+                        className="absolute inset-0 ring-2 rounded pointer-events-none"
+                        style={{ borderColor: theme.primary, borderWidth: '2px' }}
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Info section */}
           <motion.div
-            className="w-full lg:w-1/3"
+            className="w-full lg:w-1/3 lg:pt-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -288,42 +326,6 @@ export const PaintingCarousel = () => {
               )}
             </div>
           </motion.div>
-        </div>
-
-        {/* Image thumbnails */}
-        <div className="mt-10 flex justify-center gap-3 flex-wrap">
-          {paintings.map((painting, index) => (
-            <motion.button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`relative rounded overflow-hidden transition-all ${
-                index === currentIndex ? 'ring-2 shadow-lg' : 'opacity-60 hover:opacity-80'
-              }`}
-              style={{
-                width: '80px',
-                height: '60px'
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label={`${t('carousel.goToSlide')} ${index + 1}`}
-            >
-              <img
-                src={getImageUrlFromPath(painting.imageUrl)}
-                alt={painting.title.en}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="60"%3E%3Crect fill="%23e5e7eb" width="80" height="60"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="10"%3ENo Image%3C/text%3E%3C/svg%3E';
-                }}
-              />
-              {/* Highlight ring for active thumbnail */}
-              {index === currentIndex && (
-                <div
-                  className="absolute inset-0 ring-2 rounded pointer-events-none"
-                  style={{ borderColor: theme.primary, borderWidth: '2px' }}
-                />
-              )}
-            </motion.button>
-          ))}
         </div>
       </div>
     </div>
