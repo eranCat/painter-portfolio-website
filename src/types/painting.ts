@@ -1,3 +1,12 @@
+export interface CloseupImage {
+  id: string;
+  imageUrl: string;
+  title?: {
+    en: string;
+    he: string;
+  };
+}
+
 export interface Painting {
   id: string;
   title: {
@@ -14,6 +23,7 @@ export interface Painting {
   dimensions: string;
   createdAt: Date;
   tags?: string[];
+  closeups?: CloseupImage[];
 }
 
 export interface PaintingFormData {

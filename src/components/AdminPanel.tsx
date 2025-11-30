@@ -6,7 +6,7 @@ import { getPaintings, deletePainting, addPainting, updatePainting } from '../se
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
 import { uploadImageToGithub } from '../services/githubUploadService';
-import { Painting } from '../types/painting';
+import { Painting, CloseupImage } from '../types/painting';
 import { Contact } from '../types/contact';
 
 interface FormData {
@@ -17,6 +17,7 @@ interface FormData {
   imageUrl: string;
   year: number;
   dimensions: string;
+  closeups?: CloseupImage[];
 }
 
 interface AboutFormData {
@@ -35,6 +36,8 @@ export const AdminPanel = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const closeupInputRef = useRef<HTMLInputElement>(null);
+  const [closeupLoading, setCloseupLoading] = useState(false);
 
   // Convert GitHub path to full raw URL (same logic as carousel)
   const getImageUrl = (url: string): string => {
@@ -60,6 +63,7 @@ export const AdminPanel = () => {
     imageUrl: '',
     year: new Date().getFullYear(),
     dimensions: '',
+    closeups: [],
   });
   const [aboutFormData, setAboutFormData] = useState<AboutFormData>({
     descriptionEn: '',
@@ -143,6 +147,7 @@ export const AdminPanel = () => {
       imageUrl: '',
       year: new Date().getFullYear(),
       dimensions: '',
+      closeups: [],
     });
     setShowForm(true);
   };
@@ -157,6 +162,7 @@ export const AdminPanel = () => {
       imageUrl: painting.imageUrl,
       year: painting.year,
       dimensions: painting.dimensions,
+      closeups: painting.closeups || [],
     });
     setShowForm(true);
   };
@@ -180,6 +186,7 @@ export const AdminPanel = () => {
           imageUrl,
           year: formData.year,
           dimensions: formData.dimensions,
+          closeups: formData.closeups,
         });
         const updatedPaintings = paintings.map((p) =>
           p.id === editingId
@@ -190,6 +197,7 @@ export const AdminPanel = () => {
                 imageUrl,
                 year: formData.year,
                 dimensions: formData.dimensions,
+                closeups: formData.closeups,
               }
             : p
         );
@@ -315,6 +323,7 @@ export const AdminPanel = () => {
             imageUrl: result.path,
             year: new Date().getFullYear(),
             dimensions: '',
+            closeups: [],
           });
           setShowForm(true);
         } else {
@@ -327,6 +336,64 @@ export const AdminPanel = () => {
         setFormLoading(false);
       }
     }
+  };
+
+  const handleAddCloseup = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (!hasGithubConfig) {
+      alert('GitHub credentials not configured in environment variables');
+      if (closeupInputRef.current) {
+        closeupInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setCloseupLoading(true);
+    try {
+      const uploadPromises = Array.from(files).map(file =>
+        uploadImageToGithub(file, githubToken, githubOwner, githubRepo)
+      );
+
+      const results = await Promise.all(uploadPromises);
+      const newCloseups: CloseupImage[] = [];
+
+      results.forEach((result, index) => {
+        if (result.success && result.path) {
+          newCloseups.push({
+            id: `${Date.now()}-${index}`,
+            imageUrl: result.path,
+            title: { en: '', he: '' },
+          });
+        }
+      });
+
+      if (newCloseups.length > 0) {
+        setFormData({
+          ...formData,
+          closeups: [...(formData.closeups || []), ...newCloseups],
+        });
+        alert(`${newCloseups.length} closeup image${newCloseups.length > 1 ? 's' : ''} added successfully!`);
+      } else {
+        alert('All uploads failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error uploading closeups:', error);
+      alert('Error uploading closeup images');
+    } finally {
+      setCloseupLoading(false);
+      if (closeupInputRef.current) {
+        closeupInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveCloseup = (closeupId: string) => {
+    setFormData({
+      ...formData,
+      closeups: formData.closeups?.filter((c) => c.id !== closeupId) || [],
+    });
   };
 
   return (
@@ -913,13 +980,20 @@ export const AdminPanel = () => {
                   }}
                 >
                   {formData.imageUrl ? (
-                    <div>
-                      <p className="text-sm font-light mb-2" style={{ color: '#22c55e' }}>
-                        ✓ Image uploaded
-                      </p>
-                      <p className="text-xs" style={{ color: theme.textSecondary }}>
-                        {formData.imageUrl.split('/').pop()}
-                      </p>
+                    <div className="space-y-3">
+                      <img
+                        src={getImageUrl(formData.imageUrl)}
+                        alt="Preview"
+                        className="w-full h-48 object-contain rounded"
+                      />
+                      <div>
+                        <p className="text-sm font-light mb-1" style={{ color: '#22c55e' }}>
+                          ✓ Image uploaded
+                        </p>
+                        <p className="text-xs" style={{ color: theme.textSecondary }}>
+                          Click to replace
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <div>
@@ -958,6 +1032,81 @@ export const AdminPanel = () => {
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 />
+              </div>
+
+              {/* Closeup Images Section */}
+              <div className="border-t pt-4" style={{ borderColor: theme.border }}>
+                <h3 className="text-md font-light mb-4">Image Closeups (Optional)</h3>
+                <p className="text-xs mb-4" style={{ color: theme.textSecondary }}>
+                  Add detailed closeup images to showcase fine details of the artwork
+                </p>
+
+                <input
+                  ref={closeupInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleAddCloseup}
+                  className="hidden"
+                />
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={() => closeupInputRef.current?.click()}
+                  disabled={closeupLoading}
+                  className="w-full mb-4 px-4 py-2 rounded-lg font-light transition-colors disabled:opacity-50"
+                  style={{
+                    border: `1px solid ${theme.border}`,
+                    color: theme.text,
+                    backgroundColor: theme.backgroundSecondary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.mode === 'light' ? 'rgba(139, 115, 85, 0.05)' : 'rgba(212, 165, 116, 0.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                  }}
+                >
+                  {closeupLoading ? '⏳ Uploading...' : '+ Add Closeup Images'}
+                </motion.button>
+
+                {formData.closeups && formData.closeups.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {formData.closeups.map((closeup) => (
+                      <motion.div
+                        key={closeup.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative rounded-lg overflow-hidden"
+                        style={{
+                          border: `1px solid ${theme.border}`,
+                          backgroundColor: theme.backgroundSecondary,
+                        }}
+                      >
+                        <img
+                          src={getImageUrl(closeup.imageUrl)}
+                          alt="closeup"
+                          className="w-full h-24 object-cover"
+                        />
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          type="button"
+                          onClick={() => handleRemoveCloseup(closeup.id)}
+                          className="absolute top-1 right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                          style={{
+                            backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                            color: '#ffffff',
+                          }}
+                        >
+                          ✕
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-4 pt-4">

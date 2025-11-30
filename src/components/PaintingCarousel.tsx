@@ -29,6 +29,7 @@ export const PaintingCarousel = () => {
   const [imageUrl, setImageUrl] = useState<string>('');
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedCloseupIndex, setSelectedCloseupIndex] = useState<number | null>(null);
 
   // Load paintings from Firebase
   useEffect(() => {
@@ -54,9 +55,15 @@ export const PaintingCarousel = () => {
     setImageUrl(''); // Reset before loading new image
     setImageDimensions(null); // Reset dimensions
 
+    // Determine which image to load (main painting or closeup)
+    let imageToLoad = currentPainting.imageUrl;
+    if (selectedCloseupIndex !== null && currentPainting.closeups && currentPainting.closeups[selectedCloseupIndex]) {
+      imageToLoad = currentPainting.closeups[selectedCloseupIndex].imageUrl;
+    }
+
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = getImageUrlFromPath(currentPainting.imageUrl);
+    img.src = getImageUrlFromPath(imageToLoad);
 
     img.onload = () => {
       // Store original image dimensions
@@ -99,23 +106,26 @@ export const PaintingCarousel = () => {
     img.onerror = () => {
       console.warn(
         'Failed to load image from GitHub raw, using direct URL:',
-        currentPainting.imageUrl
+        imageToLoad
       );
       // Fallback to direct image URL
-      setImageUrl(currentPainting.imageUrl);
+      setImageUrl(imageToLoad);
     };
-  }, [currentIndex, paintings]);
+  }, [currentIndex, paintings, selectedCloseupIndex]);
 
   const goToPrevious = () => {
     setCurrentIndex((prev) => (prev - 1 + paintings.length) % paintings.length);
+    setSelectedCloseupIndex(null); // Reset closeup selection when changing paintings
   };
 
   const goToNext = () => {
     setCurrentIndex((prev) => (prev + 1) % paintings.length);
+    setSelectedCloseupIndex(null); // Reset closeup selection when changing paintings
   };
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
+    setSelectedCloseupIndex(null); // Reset closeup selection when changing paintings
   };
 
   if (loading) {
@@ -158,7 +168,7 @@ export const PaintingCarousel = () => {
             style={{
               backgroundColor: theme.mode === 'dark' ? '#1a1a1a' : '#f9f6f0',
               backgroundImage: theme.mode === 'dark'
-                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px), repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px)'
+                ? 'none'
                 : 'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"200\\" height=\\"200\\"><defs><filter id=\\"paperNoise\\"><feTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.65\\" numOctaves=\\"6\\" result=\\"noise\\" seed=\\"1\\" /><feDisplacementMap in=\\"SourceGraphic\\" in2=\\"noise\\" scale=\\"4\\" /></filter></defs><rect width=\\"200\\" height=\\"200\\" fill=\\"%23f9f6f0\\" filter=\\"url(%23paperNoise)\\"/></svg>"), repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px), repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px)'
             }}
           >
@@ -167,7 +177,7 @@ export const PaintingCarousel = () => {
               style={{
                 backgroundColor: theme.mode === 'dark' ? '#1a1a1a' : '#f9f6f0',
                 backgroundImage: theme.mode === 'dark'
-                  ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px), repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px)'
+                  ? 'none'
                   : 'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"200\\" height=\\"200\\"><defs><filter id=\\"paperNoise\\"><feTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.65\\" numOctaves=\\"6\\" result=\\"noise\\" seed=\\"1\\" /><feDisplacementMap in=\\"SourceGraphic\\" in2=\\"noise\\" scale=\\"4\\" /></filter></defs><rect width=\\"200\\" height=\\"200\\" fill=\\"%23f9f6f0\\" filter=\\"url(%23paperNoise)\\"/></svg>"), repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px), repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px)'
               }}
             >
@@ -365,6 +375,72 @@ export const PaintingCarousel = () => {
                   </p>
                 </div>
               )}
+
+              {/* Closeup thumbnails */}
+              {currentPainting.closeups && currentPainting.closeups.length > 0 && (
+                <div className="pt-6" style={{ borderTop: `1px solid ${theme.border}` }}>
+                  <h4 className="text-sm font-light mb-3" style={{ color: theme.text }}>
+                    Image Closeups
+                  </h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {/* Main painting thumbnail */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedCloseupIndex(null)}
+                      className={`relative rounded overflow-hidden transition-all ${
+                        selectedCloseupIndex === null ? 'ring-2 shadow-lg' : 'opacity-60 hover:opacity-80'
+                      }`}
+                      style={{
+                        width: '70px',
+                        height: '52px',
+                        borderColor: selectedCloseupIndex === null ? theme.primary : 'transparent',
+                      }}
+                    >
+                      <img
+                        src={getImageUrlFromPath(currentPainting.imageUrl)}
+                        alt="Main painting"
+                        className="w-full h-full object-cover"
+                      />
+                      {selectedCloseupIndex === null && (
+                        <div
+                          className="absolute inset-0 ring-2 rounded pointer-events-none"
+                          style={{ borderColor: theme.primary, borderWidth: '2px' }}
+                        />
+                      )}
+                    </motion.button>
+                    {/* Closeup thumbnails */}
+                    {currentPainting.closeups.map((closeup, index) => (
+                      <motion.button
+                        key={closeup.id}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSelectedCloseupIndex(index)}
+                        className={`relative rounded overflow-hidden transition-all ${
+                          selectedCloseupIndex === index ? 'ring-2 shadow-lg' : 'opacity-60 hover:opacity-80'
+                        }`}
+                        style={{
+                          width: '70px',
+                          height: '52px',
+                          borderColor: selectedCloseupIndex === index ? theme.primary : 'transparent',
+                        }}
+                      >
+                        <img
+                          src={getImageUrlFromPath(closeup.imageUrl)}
+                          alt={`Closeup ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedCloseupIndex === index && (
+                          <div
+                            className="absolute inset-0 ring-2 rounded pointer-events-none"
+                            style={{ borderColor: theme.primary, borderWidth: '2px' }}
+                          />
+                        )}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
@@ -382,7 +458,7 @@ export const PaintingCarousel = () => {
             onClick={() => setIsFullscreen(false)}
           >
             <motion.div
-              className="relative w-full h-full flex items-center justify-center"
+              className="relative w-full h-full flex items-center justify-center p-4"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
@@ -392,7 +468,7 @@ export const PaintingCarousel = () => {
               <img
                 src={imageUrl}
                 alt={paintingTitle}
-                className="w-full h-full object-cover"
+                className="max-w-[80%] max-h-[80%] object-contain"
               />
 
               {/* Close button */}
