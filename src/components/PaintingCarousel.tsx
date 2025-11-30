@@ -5,6 +5,21 @@ import { useTheme } from '../contexts/ThemeContext';
 import { getPaintings } from '../services/paintingService';
 import { Painting } from '../types/painting';
 
+// Helper function to convert image URLs to GitHub raw URLs
+const getImageUrlFromPath = (url: string): string => {
+  // If it's a Firebase Storage URL (no CORS issues), use as-is
+  if (url.includes('firebasestorage.googleapis.com')) {
+    return url;
+  }
+  // If it's already a GitHub raw URL, use as-is
+  if (url.includes('raw.githubusercontent.com')) {
+    return url;
+  }
+  // For other URLs, assume it's a GitHub file path like: owner/repo/path/to/image.jpg
+  // Convert to raw GitHub URL
+  return `https://raw.githubusercontent.com/${url}`;
+};
+
 export const PaintingCarousel = () => {
   const { t, isRTL, language } = useLanguage();
   const { theme } = useTheme();
@@ -38,23 +53,9 @@ export const PaintingCarousel = () => {
     setImageUrl(''); // Reset before loading new image
     setImageDimensions(null); // Reset dimensions
 
-    // Use GitHub raw content for images (perfect CORS support)
-    const getImageUrl = (url: string): string => {
-      // If it's a Firebase Storage URL (no CORS issues), use as-is
-      if (url.includes('firebasestorage.googleapis.com')) {
-        return url;
-      }
-      // If it's already a GitHub raw URL, use as-is
-      if (url.includes('raw.githubusercontent.com')) {
-        return url;
-      }
-      // For other URLs, assume it's a GitHub file path like: owner/repo/path/to/image.jpg
-      // Convert to raw GitHub URL
-      return `https://raw.githubusercontent.com/${url}`;
-    };
-
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    img.src = getImageUrlFromPath(currentPainting.imageUrl);
 
     img.onload = () => {
       // Store original image dimensions
@@ -102,9 +103,6 @@ export const PaintingCarousel = () => {
       // Fallback to direct image URL
       setImageUrl(currentPainting.imageUrl);
     };
-
-    // Load image from GitHub raw URL (perfect CORS support)
-    img.src = getImageUrl(currentPainting.imageUrl);
   }, [currentIndex, paintings]);
 
   const goToPrevious = () => {
@@ -292,25 +290,39 @@ export const PaintingCarousel = () => {
           </motion.div>
         </div>
 
-        {/* Thumbnail dots */}
-        <div className="mt-12 flex justify-center gap-2 flex-wrap">
-          {paintings.map((_, index) => (
+        {/* Image thumbnails */}
+        <div className="mt-10 flex justify-center gap-3 flex-wrap">
+          {paintings.map((painting, index) => (
             <motion.button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`transition-all rounded-full ${
-                index === currentIndex
-                  ? 'w-8'
-                  : 'w-3 bg-gray-300 hover:bg-gray-400'
+              className={`relative rounded overflow-hidden transition-all ${
+                index === currentIndex ? 'ring-2 shadow-lg' : 'opacity-60 hover:opacity-80'
               }`}
               style={{
-                height: '12px',
-                backgroundColor: index === currentIndex ? theme.primary : undefined
+                width: '80px',
+                height: '60px'
               }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               aria-label={`${t('carousel.goToSlide')} ${index + 1}`}
-            />
+            >
+              <img
+                src={getImageUrlFromPath(painting.imageUrl)}
+                alt={painting.title.en}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="60"%3E%3Crect fill="%23e5e7eb" width="80" height="60"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-size="10"%3ENo Image%3C/text%3E%3C/svg%3E';
+                }}
+              />
+              {/* Highlight ring for active thumbnail */}
+              {index === currentIndex && (
+                <div
+                  className="absolute inset-0 ring-2 rounded pointer-events-none"
+                  style={{ borderColor: theme.primary, borderWidth: '2px' }}
+                />
+              )}
+            </motion.button>
           ))}
         </div>
       </div>
