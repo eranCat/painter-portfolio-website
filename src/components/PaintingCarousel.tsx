@@ -392,7 +392,7 @@ export const PaintingCarousel = () => {
               <img
                 src={imageUrl}
                 alt={paintingTitle}
-                className="max-w-full max-h-screen object-contain"
+                className="w-full h-full object-cover"
               />
 
               {/* Close button */}
