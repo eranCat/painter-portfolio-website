@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAlert } from '../contexts/AlertContext';
 import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
@@ -28,6 +29,7 @@ interface AboutFormData {
 export const AdminPanel = () => {
   const { t } = useLanguage();
   const { theme } = useTheme();
+  const { showAlert } = useAlert();
   const [tab, setTab] = useState<'paintings' | 'contacts' | 'about'>('paintings');
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -116,10 +118,10 @@ export const AdminPanel = () => {
       try {
         await deletePainting(id);
         setPaintings(paintings.filter((p) => p.id !== id));
-        alert(t('admin.deleteSuccess'));
+        showAlert(t('admin.deleteSuccess'), 'success');
       } catch (error) {
         console.error('Error deleting painting:', error);
-        alert(t('admin.deleteError'));
+        showAlert(t('admin.deleteError'), 'error');
       }
     }
   };
@@ -129,10 +131,10 @@ export const AdminPanel = () => {
       try {
         await deleteContact(id);
         setContacts(contacts.filter((c) => c.id !== id));
-        alert(t('admin.deleteSuccess'));
+        showAlert(t('admin.deleteSuccess'), 'success');
       } catch (error) {
         console.error('Error deleting contact:', error);
-        alert(t('admin.deleteError'));
+        showAlert(t('admin.deleteError'), 'error');
       }
     }
   };
@@ -175,7 +177,7 @@ export const AdminPanel = () => {
       const imageUrl = formData.imageUrl;
 
       if (!imageUrl) {
-        alert(t('admin.provideImageUrl'));
+        showAlert(t('admin.provideImageUrl'), 'warning');
         return;
       }
 
@@ -202,6 +204,7 @@ export const AdminPanel = () => {
             : p
         );
         setPaintings(updatedPaintings);
+        showAlert('Painting updated successfully!', 'success');
       } else {
         await addPainting(
           {
@@ -215,11 +218,12 @@ export const AdminPanel = () => {
           imageUrl
         );
         await loadData();
+        showAlert('Painting added successfully!', 'success');
       }
       setShowForm(false);
     } catch (error) {
       console.error('Error saving painting:', error);
-      alert('Error saving painting. Please try again.');
+      showAlert('Error saving painting. Please try again.', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -251,10 +255,10 @@ export const AdminPanel = () => {
         },
       });
       await loadData();
-      alert('About section updated successfully!');
+      showAlert('About section updated successfully!', 'success');
     } catch (error) {
       console.error('Error saving about:', error);
-      alert('Error saving about. Please try again.');
+      showAlert('Error saving about. Please try again.', 'error');
     } finally {
       setFormLoading(false);
     }
@@ -265,7 +269,7 @@ export const AdminPanel = () => {
     if (!file) return;
 
     if (!hasGithubConfig) {
-      alert('GitHub credentials not configured in environment variables');
+      showAlert('GitHub credentials not configured in environment variables', 'error');
       fileInputRef.current?.click(); // Reset file input
       return;
     }
@@ -276,13 +280,13 @@ export const AdminPanel = () => {
 
       if (result.success && result.path) {
         setFormData({ ...formData, imageUrl: result.path });
-        alert('Image uploaded to GitHub successfully!');
+        showAlert('Image uploaded to GitHub successfully!', 'success');
       } else {
-        alert(`Upload failed: ${result.error}`);
+        showAlert(`Upload failed: ${result.error}`, 'error');
       }
     } catch (error) {
       console.error('Error uploading to GitHub:', error);
-      alert('Error uploading image to GitHub');
+      showAlert('Error uploading image to GitHub', 'error');
     } finally {
       setFormLoading(false);
       // Reset file input
@@ -304,7 +308,7 @@ export const AdminPanel = () => {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
       if (!hasGithubConfig) {
-        alert('GitHub credentials not configured in environment variables');
+        showAlert('GitHub credentials not configured in environment variables', 'error');
         return;
       }
 
@@ -327,11 +331,11 @@ export const AdminPanel = () => {
           });
           setShowForm(true);
         } else {
-          alert(`Upload failed: ${result.error}`);
+          showAlert(`Upload failed: ${result.error}`, 'error');
         }
       } catch (error) {
         console.error('Error uploading to GitHub:', error);
-        alert('Error uploading image to GitHub');
+        showAlert('Error uploading image to GitHub', 'error');
       } finally {
         setFormLoading(false);
       }
@@ -343,7 +347,7 @@ export const AdminPanel = () => {
     if (!files || files.length === 0) return;
 
     if (!hasGithubConfig) {
-      alert('GitHub credentials not configured in environment variables');
+      showAlert('GitHub credentials not configured in environment variables', 'error');
       if (closeupInputRef.current) {
         closeupInputRef.current.value = '';
       }
@@ -358,11 +362,12 @@ export const AdminPanel = () => {
 
       const results = await Promise.all(uploadPromises);
       const newCloseups: CloseupImage[] = [];
+      const baseTimestamp = Date.now();
 
       results.forEach((result, index) => {
         if (result.success && result.path) {
           newCloseups.push({
-            id: `${Date.now()}-${index}`,
+            id: `${baseTimestamp}-${index}-${Math.random().toString(36).substring(2, 9)}`,
             imageUrl: result.path,
             title: { en: '', he: '' },
           });
@@ -374,13 +379,13 @@ export const AdminPanel = () => {
           ...formData,
           closeups: [...(formData.closeups || []), ...newCloseups],
         });
-        alert(`${newCloseups.length} closeup image${newCloseups.length > 1 ? 's' : ''} added successfully!`);
+        showAlert(`${newCloseups.length} closeup image${newCloseups.length > 1 ? 's' : ''} added successfully!`, 'success');
       } else {
-        alert('All uploads failed. Please try again.');
+        showAlert('All uploads failed. Please try again.', 'error');
       }
     } catch (error) {
       console.error('Error uploading closeups:', error);
-      alert('Error uploading closeup images');
+      showAlert('Error uploading closeup images', 'error');
     } finally {
       setCloseupLoading(false);
       if (closeupInputRef.current) {

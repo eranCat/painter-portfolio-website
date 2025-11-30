@@ -5,6 +5,7 @@ import { Navigation } from './components/Navigation';
 import { HomePage } from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
 import { ThemeSelector } from './components/ThemeSelector';
+import { AlertProvider } from './contexts/AlertContext';
 import './App.css';
 
 function App() {
@@ -16,18 +17,20 @@ function App() {
   }, [language]);
 
   return (
-    <Router>
-      <div className={language === 'he' ? 'rtl' : 'ltr'}>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          {/* Catch-all route for hash fragments and undefined routes */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <ThemeSelector />
-      </div>
-    </Router>
+    <AlertProvider>
+      <Router>
+        <div className={language === 'he' ? 'rtl' : 'ltr'}>
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            {/* Catch-all route for hash fragments and undefined routes */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <ThemeSelector />
+        </div>
+      </Router>
+    </AlertProvider>
   );
 }
 
