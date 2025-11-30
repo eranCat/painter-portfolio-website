@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTheme } from '../contexts/ThemeContext';
 import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
 import { uploadImageToGithub } from '../services/githubUploadService';
 import { Painting } from '../types/painting';
 import { Contact } from '../types/contact';
-import { About } from '../types/about';
 
 interface FormData {
   titleEn: string;
@@ -26,10 +26,10 @@ interface AboutFormData {
 
 export const AdminPanel = () => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const [tab, setTab] = useState<'paintings' | 'contacts' | 'about'>('paintings');
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [about, setAbout] = useState<About | null>(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -95,7 +95,6 @@ export const AdminPanel = () => {
       setPaintings(paintingsData || []);
       setContacts(contactsData || []);
       if (aboutData) {
-        setAbout(aboutData);
         setAboutFormData({
           descriptionEn: aboutData.description.en,
           descriptionHe: aboutData.description.he,
@@ -334,37 +333,44 @@ export const AdminPanel = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white rounded-lg shadow-lg p-8"
+      className="rounded-lg shadow-lg p-8"
+      style={{
+        backgroundColor: theme.cardBg,
+        color: theme.text,
+      }}
     >
       {/* Tabs */}
-      <div className="flex gap-4 mb-8 border-b border-gray-200">
+      <div
+        className="flex gap-4 mb-8 border-b transition-colors"
+        style={{ borderColor: theme.border }}
+      >
         <button
           onClick={() => setTab('paintings')}
-          className={`pb-3 px-4 font-light tracking-wide transition-colors ${
-            tab === 'paintings'
-              ? 'border-b-2 border-black text-black'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
+          className="pb-3 px-4 font-light tracking-wide transition-colors"
+          style={{
+            borderBottom: tab === 'paintings' ? `2px solid ${theme.primary}` : 'none',
+            color: tab === 'paintings' ? theme.text : theme.textSecondary,
+          }}
         >
           {t('admin.paintings')}
         </button>
         <button
           onClick={() => setTab('contacts')}
-          className={`pb-3 px-4 font-light tracking-wide transition-colors ${
-            tab === 'contacts'
-              ? 'border-b-2 border-black text-black'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
+          className="pb-3 px-4 font-light tracking-wide transition-colors"
+          style={{
+            borderBottom: tab === 'contacts' ? `2px solid ${theme.primary}` : 'none',
+            color: tab === 'contacts' ? theme.text : theme.textSecondary,
+          }}
         >
           {t('admin.contacts')}
         </button>
         <button
           onClick={() => setTab('about')}
-          className={`pb-3 px-4 font-light tracking-wide transition-colors ${
-            tab === 'about'
-              ? 'border-b-2 border-black text-black'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
+          className="pb-3 px-4 font-light tracking-wide transition-colors"
+          style={{
+            borderBottom: tab === 'about' ? `2px solid ${theme.primary}` : 'none',
+            color: tab === 'about' ? theme.text : theme.textSecondary,
+          }}
         >
           {t('nav.about')}
         </button>
@@ -382,21 +388,37 @@ export const AdminPanel = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleAddClick}
-              className="px-6 py-2 bg-black text-white rounded-lg font-light hover:bg-gray-800"
+              className="px-6 py-2 rounded-lg font-light transition-colors"
+              style={{
+                backgroundColor: theme.primary,
+                color: theme.mode === 'light' ? '#ffffff' : theme.text,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme.primaryHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = theme.primary;
+              }}
             >
               + {t('admin.addPainting')}
             </motion.button>
 
             <motion.div
-              whileHover={{ scale: 1.02, borderColor: '#3b82f6' }}
+              whileHover={{ scale: 1.02, borderColor: theme.primary }}
               onDragOver={handleQuickAddDragOver}
               onDrop={handleQuickAddDrop}
-              className="flex-1 border-2 border-dashed border-gray-300 rounded-lg px-6 py-2 text-center cursor-pointer transition-colors hover:border-blue-500 hover:bg-blue-50"
+              className="flex-1 border-2 border-dashed rounded-lg px-6 py-2 text-center cursor-pointer transition-colors"
+              style={{
+                borderColor: theme.border,
+                backgroundColor: theme.backgroundSecondary,
+              }}
             >
               {formLoading ? (
-                <p className="text-sm text-gray-600">Uploading...</p>
+                <p className="text-sm" style={{ color: theme.textSecondary }}>
+                  Uploading...
+                </p>
               ) : (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm" style={{ color: theme.textSecondary }}>
                   📸 Drag & drop image here to add painting
                 </p>
               )}
@@ -404,15 +426,17 @@ export const AdminPanel = () => {
           </div>
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
+            <div className="text-center py-8" style={{ color: theme.textSecondary }}>
+              {t('admin.loading')}
+            </div>
           ) : paintings.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8" style={{ color: theme.textSecondary }}>
               {t('admin.noPaintingsYet')}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead style={{ backgroundColor: theme.backgroundSecondary, borderColor: theme.border }} className="border-b">
                   <tr>
                     <th className="px-4 py-3 font-light">Image</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.title')}</th>
@@ -425,7 +449,14 @@ export const AdminPanel = () => {
                   {paintings.map((painting) => (
                     <motion.tr
                       key={painting.id}
-                      className="border-b border-gray-200 hover:bg-gray-50"
+                      className="border-b transition-colors"
+                      style={{ borderColor: theme.border }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                     >
                       <td className="px-4 py-3">
                         <img
@@ -447,14 +478,27 @@ export const AdminPanel = () => {
                       <td className="px-4 py-3">{painting.title.en}</td>
                       <td className="px-4 py-3">{painting.year}</td>
                       <td className="px-4 py-3">
-                        <span className="dimensions text-xs text-gray-400">Loading...</span>
+                        <span className="dimensions text-xs" style={{ color: theme.textSecondary }}>
+                          Loading...
+                        </span>
                       </td>
                       <td className="px-4 py-3 space-x-2">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleEditClick(painting)}
-                          className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100"
+                          className="px-3 py-1 text-xs rounded transition-colors"
+                          style={{
+                            borderColor: theme.border,
+                            border: `1px solid ${theme.border}`,
+                            color: theme.text,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                         >
                           {t('admin.edit')}
                         </motion.button>
@@ -462,7 +506,11 @@ export const AdminPanel = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDeletePainting(painting.id)}
-                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                          className="px-3 py-1 text-xs rounded transition-colors"
+                          style={{
+                            backgroundColor: theme.mode === 'light' ? '#fee2e2' : 'rgba(239, 68, 68, 0.2)',
+                            color: theme.mode === 'light' ? '#b91c1c' : '#ff6b6b',
+                          }}
                         >
                           {t('admin.delete')}
                         </motion.button>
@@ -484,17 +532,19 @@ export const AdminPanel = () => {
           className="space-y-4"
         >
           {loading ? (
-            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
+            <div className="text-center py-8" style={{ color: theme.textSecondary }}>
+              {t('admin.loading')}
+            </div>
           ) : contacts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 font-light">
+              <p className="font-light" style={{ color: theme.textSecondary }}>
                 {t('admin.noContactsYet')}
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead style={{ backgroundColor: theme.backgroundSecondary, borderColor: theme.border }} className="border-b">
                   <tr>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.name')}</th>
                     <th className="px-4 py-3 font-light">{t('admin.tableHeaders.email')}</th>
@@ -507,23 +557,49 @@ export const AdminPanel = () => {
                   {contacts.map((contact) => (
                     <motion.tr
                       key={contact.id}
-                      className={`border-b border-gray-200 hover:bg-gray-50 ${
-                        !contact.read ? 'bg-blue-50' : ''
-                      }`}
+                      className="border-b transition-colors"
+                      style={{
+                        borderColor: theme.border,
+                        backgroundColor: !contact.read
+                          ? theme.mode === 'light'
+                            ? 'rgba(59, 130, 246, 0.05)'
+                            : 'rgba(59, 130, 246, 0.1)'
+                          : 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = !contact.read
+                          ? theme.mode === 'light'
+                            ? 'rgba(59, 130, 246, 0.05)'
+                            : 'rgba(59, 130, 246, 0.1)'
+                          : 'transparent';
+                      }}
                     >
                       <td className="px-4 py-3 font-semibold">{contact.name}</td>
                       <td className="px-4 py-3">{contact.email}</td>
                       <td className="px-4 py-3 max-w-xs truncate">
                         {contact.message}
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">
+                      <td className="px-4 py-3 text-xs" style={{ color: theme.textSecondary }}>
                         {contact.timestamp.toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 space-x-2">
                         <motion.a
                           whileHover={{ scale: 1.05 }}
                           href={`mailto:${contact.email}`}
-                          className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 inline-block"
+                          className="px-3 py-1 text-xs rounded inline-block transition-colors"
+                          style={{
+                            border: `1px solid ${theme.border}`,
+                            color: theme.text,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                         >
                           {t('admin.buttons.reply')}
                         </motion.a>
@@ -531,7 +607,11 @@ export const AdminPanel = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleDeleteContact(contact.id)}
-                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                          className="px-3 py-1 text-xs rounded transition-colors"
+                          style={{
+                            backgroundColor: theme.mode === 'light' ? '#fee2e2' : 'rgba(239, 68, 68, 0.2)',
+                            color: theme.mode === 'light' ? '#b91c1c' : '#ff6b6b',
+                          }}
                         >
                           {t('admin.buttons.delete')}
                         </motion.button>
@@ -554,12 +634,19 @@ export const AdminPanel = () => {
         >
           <h3 className="text-lg font-light mb-4">{t('nav.about')} Content</h3>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">{t('admin.loading')}</div>
+            <div className="text-center py-8" style={{ color: theme.textSecondary }}>
+              {t('admin.loading')}
+            </div>
           ) : (
             <form onSubmit={handleSubmitAboutForm} className="space-y-6">
               {/* Main Description */}
               <div>
-                <h4 className="text-md font-light mb-3 border-b pb-2">Main Description</h4>
+                <h4
+                  className="text-md font-light mb-3 border-b pb-2"
+                  style={{ borderColor: theme.border }}
+                >
+                  Main Description
+                </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-light mb-2">English</label>
@@ -569,7 +656,23 @@ export const AdminPanel = () => {
                         setAboutFormData({ ...aboutFormData, descriptionEn: e.target.value })
                       }
                       rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                      style={{
+                        borderColor: theme.border,
+                        border: `1px solid ${theme.border}`,
+                        backgroundColor: theme.backgroundSecondary,
+                        color: theme.text,
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                          theme.mode === 'light'
+                            ? 'rgba(139, 115, 85, 0.1)'
+                            : 'rgba(212, 165, 116, 0.1)'
+                        }`;
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                   <div>
@@ -580,20 +683,48 @@ export const AdminPanel = () => {
                         setAboutFormData({ ...aboutFormData, descriptionHe: e.target.value })
                       }
                       rows={4}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                      style={{
+                        borderColor: theme.border,
+                        border: `1px solid ${theme.border}`,
+                        backgroundColor: theme.backgroundSecondary,
+                        color: theme.text,
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                          theme.mode === 'light'
+                            ? 'rgba(139, 115, 85, 0.1)'
+                            : 'rgba(212, 165, 116, 0.1)'
+                        }`;
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   </div>
                 </div>
               </div>
 
-
-              <div className="flex gap-4 pt-4 border-t">
+              <div
+                className="flex gap-4 pt-4 border-t transition-colors"
+                style={{ borderColor: theme.border }}
+              >
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={formLoading}
-                  className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  className="flex-1 py-2 rounded-lg font-light transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.primary,
+                    color: theme.mode === 'light' ? '#ffffff' : theme.text,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.primaryHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.primary;
+                  }}
                 >
                   {formLoading ? t('admin.buttons.saving') : 'Save About Section'}
                 </motion.button>
@@ -608,13 +739,18 @@ export const AdminPanel = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setShowForm(false)}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-screen overflow-y-auto"
+            className="rounded-lg p-8 max-w-2xl w-full max-h-screen overflow-y-auto"
+            style={{
+              backgroundColor: theme.cardBg,
+              color: theme.text,
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-2xl font-light mb-6">
@@ -632,7 +768,22 @@ export const AdminPanel = () => {
                       setFormData({ ...formData, titleEn: e.target.value })
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                    style={{
+                      border: `1px solid ${theme.border}`,
+                      backgroundColor: theme.backgroundSecondary,
+                      color: theme.text,
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                        theme.mode === 'light'
+                          ? 'rgba(139, 115, 85, 0.1)'
+                          : 'rgba(212, 165, 116, 0.1)'
+                      }`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
                 <div>
@@ -644,7 +795,22 @@ export const AdminPanel = () => {
                       setFormData({ ...formData, titleHe: e.target.value })
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                    style={{
+                      border: `1px solid ${theme.border}`,
+                      backgroundColor: theme.backgroundSecondary,
+                      color: theme.text,
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                        theme.mode === 'light'
+                          ? 'rgba(139, 115, 85, 0.1)'
+                          : 'rgba(212, 165, 116, 0.1)'
+                      }`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
@@ -659,7 +825,22 @@ export const AdminPanel = () => {
                     setFormData({ ...formData, descriptionEn: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                  style={{
+                    border: `1px solid ${theme.border}`,
+                    backgroundColor: theme.backgroundSecondary,
+                    color: theme.text,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                      theme.mode === 'light'
+                        ? 'rgba(139, 115, 85, 0.1)'
+                        : 'rgba(212, 165, 116, 0.1)'
+                    }`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
@@ -673,7 +854,22 @@ export const AdminPanel = () => {
                     setFormData({ ...formData, descriptionHe: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                  style={{
+                    border: `1px solid ${theme.border}`,
+                    backgroundColor: theme.backgroundSecondary,
+                    color: theme.text,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                      theme.mode === 'light'
+                        ? 'rgba(139, 115, 85, 0.1)'
+                        : 'rgba(212, 165, 116, 0.1)'
+                    }`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
@@ -695,7 +891,7 @@ export const AdminPanel = () => {
                   }}
                 />
                 <motion.div
-                  whileHover={{ borderColor: '#3b82f6' }}
+                  whileHover={{ borderColor: theme.primary }}
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -710,18 +906,28 @@ export const AdminPanel = () => {
                       handleFileUploadToGithub(event);
                     }
                   }}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-blue-500 hover:bg-blue-50"
+                  className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors"
+                  style={{
+                    borderColor: theme.border,
+                    backgroundColor: theme.backgroundSecondary,
+                  }}
                 >
                   {formData.imageUrl ? (
                     <div>
-                      <p className="text-sm font-light text-green-600 mb-2">✓ Image uploaded</p>
-                      <p className="text-xs text-gray-500">{formData.imageUrl.split('/').pop()}</p>
+                      <p className="text-sm font-light mb-2" style={{ color: '#22c55e' }}>
+                        ✓ Image uploaded
+                      </p>
+                      <p className="text-xs" style={{ color: theme.textSecondary }}>
+                        {formData.imageUrl.split('/').pop()}
+                      </p>
                     </div>
                   ) : (
                     <div>
                       <p className="text-lg mb-2">📸</p>
                       <p className="text-sm font-light mb-1">Drag and drop your image here</p>
-                      <p className="text-xs text-gray-500">or click to browse</p>
+                      <p className="text-xs" style={{ color: theme.textSecondary }}>
+                        or click to browse
+                      </p>
                     </div>
                   )}
                 </motion.div>
@@ -735,7 +941,22 @@ export const AdminPanel = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, year: parseInt(e.target.value) })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-colors"
+                  style={{
+                    border: `1px solid ${theme.border}`,
+                    backgroundColor: theme.backgroundSecondary,
+                    color: theme.text,
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.boxShadow = `0 0 0 3px ${
+                      theme.mode === 'light'
+                        ? 'rgba(139, 115, 85, 0.1)'
+                        : 'rgba(212, 165, 116, 0.1)'
+                    }`;
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
@@ -745,7 +966,17 @@ export const AdminPanel = () => {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={formLoading}
-                  className="flex-1 bg-black text-white py-2 rounded-lg font-light hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  className="flex-1 py-2 rounded-lg font-light transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: theme.primary,
+                    color: theme.mode === 'light' ? '#ffffff' : theme.text,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.primaryHover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.primary;
+                  }}
                 >
                   {formLoading ? t('admin.buttons.saving') : editingId ? t('admin.buttons.update') : t('admin.buttons.add')}
                 </motion.button>
@@ -754,7 +985,17 @@ export const AdminPanel = () => {
                   whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="flex-1 border border-gray-300 py-2 rounded-lg font-light hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-2 rounded-lg font-light transition-colors"
+                  style={{
+                    border: `1px solid ${theme.border}`,
+                    color: theme.text,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme.backgroundSecondary;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   {t('admin.buttons.cancel')}
                 </motion.button>

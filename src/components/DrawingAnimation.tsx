@@ -18,24 +18,19 @@ export const DrawingAnimation: React.FC<DrawingAnimationProps> = ({
   duration = 2,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [pathLengths, setPathLengths] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     if (svgRef.current) {
       const paths = svgRef.current.querySelectorAll('path, circle, rect, line, polygon');
-      const lengths: { [key: string]: number } = {};
 
-      paths.forEach((path, index) => {
+      paths.forEach((path) => {
         if (path instanceof SVGGeometryElement) {
           const length = path.getTotalLength();
-          lengths[`path-${index}`] = length;
           // Set initial state
           path.setAttribute('stroke-dasharray', length.toString());
           path.setAttribute('stroke-dashoffset', length.toString());
         }
       });
-
-      setPathLengths(lengths);
     }
   }, []);
 
@@ -131,16 +126,6 @@ export const DrawingLine: React.FC<DrawingLineProps> = ({
   duration = 1,
 }) => {
   const lineRef = useRef<SVGLineElement>(null);
-  const [length, setLength] = useState(0);
-
-  useEffect(() => {
-    if (lineRef.current) {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const lineLength = Math.sqrt(dx * dx + dy * dy);
-      setLength(lineLength);
-    }
-  }, [x1, y1, x2, y2]);
 
   const lineLength = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
