@@ -28,6 +28,7 @@ export const PaintingCarousel = () => {
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string>('');
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Load paintings from Firebase
   useEffect(() => {
@@ -205,15 +206,42 @@ export const PaintingCarousel = () => {
                 )}
               </AnimatePresence>
 
-              {/* Image counter */}
-              <div
-                className="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-medium"
-                style={{
-                  backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
-                  color: theme.mode === 'dark' ? '#fff' : '#000'
-                }}
-              >
-                {currentIndex + 1} / {paintings.length}
+              {/* Image counter and fullscreen button */}
+              <div className="absolute top-4 right-4 flex items-center gap-3">
+                <div
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
+                    color: theme.mode === 'dark' ? '#fff' : '#000'
+                  }}
+                >
+                  {currentIndex + 1} / {paintings.length}
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsFullscreen(true)}
+                  className="p-2 rounded-full transition-colors"
+                  style={{
+                    backgroundColor: theme.mode === 'dark' ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)',
+                    color: theme.mode === 'dark' ? '#fff' : '#000'
+                  }}
+                  aria-label={t('gallery.fullscreen') || 'View fullscreen'}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6v4m12-4h4v4M6 18h4v-4m12 4h-4v-4"
+                    />
+                  </svg>
+                </motion.button>
               </div>
             </div>
 
@@ -341,6 +369,103 @@ export const PaintingCarousel = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Fullscreen modal */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsFullscreen(false)}
+          >
+            <motion.div
+              className="relative w-full h-full flex items-center justify-center"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={imageUrl}
+                alt={paintingTitle}
+                className="max-w-full max-h-full object-contain"
+              />
+
+              {/* Close button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsFullscreen(false)}
+                className="absolute top-6 right-6 p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all"
+                aria-label={t('common.close') || 'Close'}
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.button>
+
+              {/* Navigation arrows in fullscreen */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={goToPrevious}
+                className="absolute left-6 p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all"
+                aria-label={t('carousel.previous')}
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={goToNext}
+                className="absolute right-6 p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all"
+                aria-label={t('carousel.next')}
+              >
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
