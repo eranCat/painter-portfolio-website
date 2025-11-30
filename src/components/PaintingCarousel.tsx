@@ -382,7 +382,7 @@ export const PaintingCarousel = () => {
             onClick={() => setIsFullscreen(false)}
           >
             <motion.div
-              className="relative w-full h-full flex items-center justify-center"
+              className="relative w-full h-full flex items-center justify-center p-12"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
@@ -392,7 +392,7 @@ export const PaintingCarousel = () => {
               <img
                 src={imageUrl}
                 alt={paintingTitle}
-                className="max-w-full max-h-full object-contain"
+                className="w-auto h-auto max-w-[calc(100%-3rem)] max-h-[calc(100%-3rem)] object-contain"
               />
 
               {/* Close button */}
