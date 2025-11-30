@@ -177,13 +177,19 @@ export const PaintingCarousel = () => {
                 ) : (
                   <motion.div
                     key={`placeholder-${currentIndex}`}
-                    className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center"
+                    className="w-full h-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: theme.mode === 'dark' ? '#1a1a1a' : '#f9f6f0',
+                      backgroundImage: theme.mode === 'dark'
+                        ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px), repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px)'
+                        : 'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"200\\" height=\\"200\\"><defs><filter id=\\"paperNoise\\"><feTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.65\\" numOctaves=\\"6\\" result=\\"noise\\" seed=\\"1\\" /><feDisplacementMap in=\\"SourceGraphic\\" in2=\\"noise\\" scale=\\"4\\" /></filter></defs><rect width=\\"200\\" height=\\"200\\" fill=\\"%23f9f6f0\\" filter=\\"url(%23paperNoise)\\"/></svg>"), repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px), repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px)'
+                    }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="text-center text-gray-500">
+                    <div className="text-center" style={{ color: theme.textSecondary }}>
                       <div className="text-4xl mb-2">🖼️</div>
                       <p>{t('gallery.imageLoading')}</p>
                     </div>
