@@ -152,7 +152,15 @@ export const PaintingCarousel = () => {
         {/* Carousel container - Stack vertically on mobile, horizontal on lg */}
         <div className="flex flex-col lg:flex-row gap-12 lg:items-start">
           {/* Image section */}
-          <div className="w-full lg:w-2/3 flex-shrink-0">
+          <div
+            className="w-full lg:w-2/3 flex-shrink-0"
+            style={{
+              backgroundColor: theme.mode === 'dark' ? '#1a1a1a' : '#f9f6f0',
+              backgroundImage: theme.mode === 'dark'
+                ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.06) 2px, rgba(255, 255, 255, 0.06) 4px), repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px), repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.04) 4px, rgba(255, 255, 255, 0.04) 8px)'
+                : 'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"200\\" height=\\"200\\"><defs><filter id=\\"paperNoise\\"><feTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.65\\" numOctaves=\\"6\\" result=\\"noise\\" seed=\\"1\\" /><feDisplacementMap in=\\"SourceGraphic\\" in2=\\"noise\\" scale=\\"4\\" /></filter></defs><rect width=\\"200\\" height=\\"200\\" fill=\\"%23f9f6f0\\" filter=\\"url(%23paperNoise)\\"/></svg>"), repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(139, 115, 85, 0.15) 1px, rgba(139, 115, 85, 0.15) 2px), repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px), repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(139, 115, 85, 0.10) 3px, rgba(139, 115, 85, 0.10) 6px)'
+            }}
+          >
             <div
               className="relative rounded-lg overflow-hidden shadow-lg w-full h-96 md:h-[500px] lg:h-[550px]"
               style={{
