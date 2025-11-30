@@ -149,7 +149,7 @@ export const PaintingCarousel = () => {
       : currentPainting.description.en;
 
   return (
-    <div className={`py-12 md:py-20 ${isRTL ? 'rtl' : 'ltr'}`} style={{ backgroundColor: theme.background }}>
+    <div className={`py-12 md:py-20 ${isRTL ? 'rtl' : 'ltr'}`} style={{ backgroundColor: 'transparent' }}>
       <div className="max-w-6xl mx-auto px-4">
         {/* Carousel container */}
         <div className="flex flex-col lg:flex-row gap-8 items-center">

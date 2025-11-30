@@ -30,7 +30,7 @@ export const HomePage = () => {
 
   return (
     <main>
-      <section id="about" className="py-20 relative" style={{ backgroundColor: theme.backgroundSecondary }}>
+      <section id="about" className="py-20 relative" style={{ backgroundColor: 'transparent' }}>
         <div className={`max-w-4xl mx-auto px-4 ${isRTL ? 'rtl' : 'ltr'}`}>
           {/* Decorative corner animations */}
           <svg
@@ -69,11 +69,11 @@ export const HomePage = () => {
         </div>
       </section>
 
-      <section id="gallery" style={{ backgroundColor: theme.background }}>
+      <section id="gallery" style={{ backgroundColor: 'transparent' }}>
         <PaintingCarousel />
       </section>
 
-      <section id="contact" className="py-20" style={{ backgroundColor: theme.background }}>
+      <section id="contact" className="py-20" style={{ backgroundColor: 'transparent' }}>
         <div className="max-w-4xl mx-auto px-4">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
