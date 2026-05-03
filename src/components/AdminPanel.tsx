@@ -6,7 +6,7 @@ import { useAlert } from '../contexts/AlertContext';
 import { getPaintings, deletePainting, addPainting, updatePainting } from '../services/paintingService';
 import { getContacts, deleteContact } from '../services/contactService';
 import { getAbout, updateAbout } from '../services/aboutService';
-import { uploadImageToGithub } from '../services/githubUploadService';
+import { uploadImage } from '../services/githubUploadService';
 import { Painting, CloseupImage } from '../types/painting';
 import { Contact } from '../types/contact';
 
@@ -52,11 +52,7 @@ export const AdminPanel = () => {
     return `https://raw.githubusercontent.com/${url}`;
   };
 
-  // Load GitHub credentials from environment variables
-  const githubToken = process.env.REACT_APP_GITHUB_TOKEN || '';
-  const githubOwner = process.env.REACT_APP_GITHUB_OWNER || '';
-  const githubRepo = process.env.REACT_APP_GITHUB_REPO || '';
-  const hasGithubConfig = githubToken && githubOwner && githubRepo;
+
   const [formData, setFormData] = useState<FormData>({
     titleEn: '',
     titleHe: '',
@@ -268,28 +264,21 @@ export const AdminPanel = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!hasGithubConfig) {
-      showAlert('GitHub credentials not configured in environment variables', 'error');
-      fileInputRef.current?.click(); // Reset file input
-      return;
-    }
-
     setFormLoading(true);
     try {
-      const result = await uploadImageToGithub(file, githubToken, githubOwner, githubRepo);
+      const result = await uploadImage(file);
 
-      if (result.success && result.path) {
-        setFormData({ ...formData, imageUrl: result.path });
-        showAlert('Image uploaded to GitHub successfully!', 'success');
+      if (result.success && result.url) {
+        setFormData({ ...formData, imageUrl: result.url });
+        showAlert('Image uploaded successfully!', 'success');
       } else {
         showAlert(`Upload failed: ${result.error}`, 'error');
       }
     } catch (error) {
-      console.error('Error uploading to GitHub:', error);
-      showAlert('Error uploading image to GitHub', 'error');
+      console.error('Error uploading image:', error);
+      showAlert('Error uploading image', 'error');
     } finally {
       setFormLoading(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -307,24 +296,18 @@ export const AdminPanel = () => {
 
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      if (!hasGithubConfig) {
-        showAlert('GitHub credentials not configured in environment variables', 'error');
-        return;
-      }
-
       setFormLoading(true);
       try {
-        const result = await uploadImageToGithub(file, githubToken, githubOwner, githubRepo);
+        const result = await uploadImage(file);
 
-        if (result.success && result.path) {
-          // Open the form with the uploaded image
+        if (result.success && result.url) {
           setEditingId(null);
           setFormData({
             titleEn: '',
             titleHe: '',
             descriptionEn: '',
             descriptionHe: '',
-            imageUrl: result.path,
+            imageUrl: result.url,
             year: new Date().getFullYear(),
             dimensions: '',
             closeups: [],
@@ -334,8 +317,8 @@ export const AdminPanel = () => {
           showAlert(`Upload failed: ${result.error}`, 'error');
         }
       } catch (error) {
-        console.error('Error uploading to GitHub:', error);
-        showAlert('Error uploading image to GitHub', 'error');
+        console.error('Error uploading image:', error);
+        showAlert('Error uploading image', 'error');
       } finally {
         setFormLoading(false);
       }
@@ -346,29 +329,18 @@ export const AdminPanel = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    if (!hasGithubConfig) {
-      showAlert('GitHub credentials not configured in environment variables', 'error');
-      if (closeupInputRef.current) {
-        closeupInputRef.current.value = '';
-      }
-      return;
-    }
-
     setCloseupLoading(true);
     try {
-      const uploadPromises = Array.from(files).map(file =>
-        uploadImageToGithub(file, githubToken, githubOwner, githubRepo)
-      );
-
+      const uploadPromises = Array.from(files).map(file => uploadImage(file));
       const results = await Promise.all(uploadPromises);
       const newCloseups: CloseupImage[] = [];
       const baseTimestamp = Date.now();
 
       results.forEach((result, index) => {
-        if (result.success && result.path) {
+        if (result.success && result.url) {
           newCloseups.push({
             id: `${baseTimestamp}-${index}-${Math.random().toString(36).substring(2, 9)}`,
-            imageUrl: result.path,
+            imageUrl: result.url,
             title: { en: '', he: '' },
           });
         }
