@@ -1,46 +1,156 @@
-# Getting Started with Create React App
+# Painter Portfolio Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A minimal, creative portfolio website for painters with bilingual support (Hebrew & English), Firebase backend, and admin panel for managing paintings.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Bilingual Support**: Full Hebrew and English interface with seamless language switching
+- **Responsive Design**: Mobile-first approach optimized for all devices
+- **Firebase Integration**: Real-time database and Cloud Storage for painting images
+- **Admin Panel**: Secure dashboard for artists to manage their portfolio
+  - Add/edit/delete paintings with descriptions
+  - Upload high-quality images to Cloud Storage
+  - Manage artist profile information
+- **WhatsApp Contact Integration**: Direct messaging capability for inquiries
+- **Performance Optimized**: Fast loading times with optimized image delivery
+- **Beautiful Galleries**: Showcase paintings in elegant layouts
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Frontend**: React with TypeScript
+- **Styling**: CSS with responsive design
+- **Backend**: Firebase Realtime Database
+- **Storage**: Firebase Cloud Storage
+- **Authentication**: Firebase Authentication
+- **Hosting**: Firebase Hosting (ready for deployment)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Project Structure
 
-### `npm test`
+```
+├── src/
+│   ├── components/       # React components (Gallery, Admin, etc.)
+│   ├── pages/           # Page components
+│   ├── hooks/           # Custom React hooks
+│   ├── services/        # Firebase and API services
+│   ├── styles/          # CSS modules
+│   └── utils/           # Helper functions
+├── public/              # Static assets
+└── firebase.config.js   # Firebase configuration
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js 16+
+- npm or yarn
+- Firebase account
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Clone the repository
+git clone https://github.com/eranCat/painter-portfolio-website.git
+cd painter-portfolio-website
 
-### `npm run eject`
+# Install dependencies
+npm install
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# Setup Firebase
+# 1. Create a Firebase project at firebase.google.com
+# 2. Copy your config to firebase.config.js
+# 3. Enable Realtime Database and Storage
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Start development server
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Development
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+# Run in development mode
+npm start
 
-## Learn More
+# Build for production
+npm run build
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Deploy to Firebase
+npm run deploy
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Configuration
+
+### Firebase Setup
+
+1. Create a `.env.local` file:
+```
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+```
+
+2. Initialize Firebase Database with the following structure:
+```
+paintings/
+  ├── {id}/
+  │   ├── title: String
+  │   ├── description: String
+  │   ├── imageUrl: String
+  │   └── date: Timestamp
+artist/
+  ├── name: String
+  ├── bio: String
+  └── imageUrl: String
+```
+
+## Features in Detail
+
+### Gallery View
+- Browse all paintings with descriptions
+- Filter and sort by date or title
+- Fullscreen lightbox for detailed viewing
+- Language-specific descriptions
+
+### Admin Panel
+- Secure login with Firebase Authentication
+- Add new paintings with image upload
+- Edit painting details
+- Delete paintings with confirmation
+- Manage artist profile
+
+### Contact Form
+- Direct WhatsApp integration
+- Quick inquiry submissions
+- Email notifications (optional)
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## Contributing
+
+This is a personal portfolio project. Contributions welcome via pull requests.
+
+## License
+
+MIT License - feel free to use as inspiration for your own projects.
+
+## Future Enhancements
+
+- [ ] Painting categories/collections
+- [ ] Client testimonials section
+- [ ] Blog/artist updates
+- [ ] Social media integration
+- [ ] Commission request form
+- [ ] Analytics dashboard
+
+## Support
+
+For issues or questions, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ by Eran Karasho**
