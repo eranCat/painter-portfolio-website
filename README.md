@@ -58,18 +58,18 @@ npm install
    - Create a `.env.local` file in the root directory
    - Add your Firebase configuration:
 ```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_WHATSAPP_PHONE=your_whatsapp_number
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+REACT_APP_WHATSAPP_NUMBER=your_whatsapp_number
 ```
 
 4. Start the development server:
 ```bash
-npm run dev
+npm start
 ```
 
 5. Build for production:
@@ -125,20 +125,20 @@ npm run build
 
 ## 🚀 Deployment
 
+### GitHub Pages
+This project is deployed via GitHub Actions on every push to `main`.
+
 ### Firebase Hosting
 ```bash
 npm run build
 firebase deploy
 ```
 
-### GitHub Pages
-Configure `vite.config.ts` with your repository name and push to `gh-pages` branch.
-
-## 🤝 Contributing
+## 🔝 Contributing
 
 Feel free to fork this project and submit pull requests for any improvements.
 
-## 📝 License
+## 🝝 License
 
 This project is open source and available under the MIT License.
 
@@ -149,7 +149,7 @@ GitHub: [@eranCat](https://github.com/eranCat)
 
 ## 🔗 Links
 
-- [Live Demo](https://painter-portfolio-example.com) (replace with actual URL)
+- [🌐 Live Site](https://erancat.github.io/painter-portfolio-website/)
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [React Documentation](https://react.dev)
 - [Tailwind CSS](https://tailwindcss.com)
